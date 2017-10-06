@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/NoahArkPlayer.iml" filepath="$PROJECT_DIR$/NoahArkPlayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/SC_Library/SC_Library.iml" filepath="$PROJECT_DIR$/SC_Library/SC_Library.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>
