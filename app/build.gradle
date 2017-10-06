@@ -6,13 +6,13 @@ android {
         release {
             keyAlias 'samcaikey'
             keyPassword '049895543'
-            storeFile file('samcaiapp.jks')
+            storeFile file('./samcaiapp.jks')
             storePassword '049895543'
         }
         debug {
             keyAlias 'debug'
             keyPassword '049895543'
-            storeFile file('samcaiappdebug.jks')
+            storeFile file('./samcaiappdebug.jks')
             storePassword '049895543'
         }
     }
@@ -20,11 +20,12 @@ android {
     buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.noahark.noaharkplayer"
-        minSdkVersion 26
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
@@ -44,6 +45,8 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
+    compile 'com.android.support:support-v4:26.+'
+    compile 'com.google.android.gms:play-services-plus:11.0.4'
     testCompile 'junit:junit:4.12'
     //---------------
     compile project(':SC_Library')
