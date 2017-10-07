@@ -53,8 +53,6 @@ public class PlayingActivity extends BaseActivity {
         MyPagerAdapter mMyPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), mFragments);
         vpPlaying.setAdapter(mMyPagerAdapter);
 
-//        stlLay.setViewPager(vpPlaying, mTitles, this, mFragments);
-
         stlLay.setTabData(mTitles);
         stlLay.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
