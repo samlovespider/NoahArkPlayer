@@ -6,11 +6,74 @@
     android:layout_height="match_parent"
     tools:context="com.noahark.noaharkplayer.ui.activity.MainActivity">
 
-    <Button
-        android:id="@+id/btn"
+    <ListView
+        android:id="@+id/lvMusics"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/linController"
+        android:background="#ffffff"
+        android:cacheColorHint="#00000000"
+        android:divider="@null"/>
+
+    <LinearLayout
+        android:id="@+id/linController"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/app_name"/>
+        android:layout_alignParentBottom="true"
+        android:orientation="vertical">
 
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
 
+            <TextView
+                android:id="@+id/tvCurrentTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="5dp"
+                android:text="00:00"/>
+
+            <TextView
+                android:id="@+id/tvTotalTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_margin="5dp"
+                android:text="00:00"/>
+        </RelativeLayout>
+
+        <SeekBar
+            android:id="@+id/sbTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/chocolate"
+            android:gravity="center"
+            android:padding="5dp">
+
+            <Button
+                android:id="@+id/btnPrevious"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/ic_previous"/>
+
+            <Button
+                android:id="@+id/btnPause"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginLeft="30dp"
+                android:layout_marginRight="30dp"
+                android:background="@drawable/ic_pause"/>
+
+            <Button
+                android:id="@+id/btnNext"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:background="@drawable/ic_next"/>
+        </LinearLayout>
+    </LinearLayout>
 </RelativeLayout>

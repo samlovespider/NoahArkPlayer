@@ -10,7 +10,7 @@ import android.view.MenuItem;
 import com.caizhenliang.mylibrary.ui.view.MyAlertDialogTool;
 import com.caizhenliang.mylibrary.util.ACache;
 import com.caizhenliang.mylibrary.util.SCBus;
-import com.caizhenliang.mylibrary.util.SCLog;
+import com.caizhenliang.mylibrary.util.SCLogHelper;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -145,11 +145,11 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
 
     @Override
     public void logW(Object o) {
-        SCLog.w(TAG, o);
+        SCLogHelper.w(TAG, o);
     }
 
     @Override
     public void logW(String title, Object o) {
-        SCLog.w(TAG, title, o);
+        SCLogHelper.w(TAG, title, o);
     }
 }

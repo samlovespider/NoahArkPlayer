@@ -6,7 +6,7 @@ import android.util.Log;
  * Created by caizhenliang on 2017/9/16.
  */
 
-public class SCLog {
+public class SCLogHelper {
 
     /**
      * @param tag
