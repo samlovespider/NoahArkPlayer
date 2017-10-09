@@ -1,20 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="16dp"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp"
-    android:paddingBottom="16dp"
     tools:context="com.noahark.noaharkplayer.MainActivity">
 
-    <ListView
-        android:id="@+id/lvMusicList"
+
+    <LinearLayout
+
         android:layout_width="match_parent"
-        android:layout_height="match_parent"></ListView>
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:clickable="true"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="300dp"
+                android:layout_height="50dp"
+                android:orientation="vertical">
 
 
-</RelativeLayout>
+                <TextView
+                    android:id="@+id/tvSongTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Song Title"
+                    android:textColor="#000000"
+                    android:textSize="24sp"
+                    android:typeface="sans" />
 
+                <TextView
+                    android:id="@+id/tvAlbumTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="16dp"
+                    android:paddingStart="16dp"
+                    android:text="Artist Title"
+                    android:textColor="#7e7e7e"
+                    android:textSize="18sp"
+                    android:typeface="sans" />
+            </LinearLayout>
+        </LinearLayout>
+
+    </LinearLayout>
+</LinearLayout>
