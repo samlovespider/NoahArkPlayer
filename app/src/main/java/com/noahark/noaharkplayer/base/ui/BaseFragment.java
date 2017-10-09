@@ -4,17 +4,17 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 
-import com.caizhenliang.mylibrary.ui.activity.MyBaseActivity;
+import com.caizhenliang.mylibrary.ui.fragment.MyBaseFragment;
 import com.noahark.noaharkplayer.BuildConfig;
 
 import org.androidannotations.annotations.AfterViews;
-import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.EFragment;
 
 /**
- * Created by caizhenliang on 2017/8/18.
+ * Created by caizhenliang on 2017/10/9.
  */
-@EActivity
-abstract public class BaseActivity extends MyBaseActivity {
+@EFragment
+abstract public class BaseFragment extends MyBaseFragment {
 
     @AfterViews
     @Override
@@ -68,4 +68,5 @@ abstract public class BaseActivity extends MyBaseActivity {
     public void initCheckedChange(CompoundButton button, boolean isChecked) {
 
     }
+
 }

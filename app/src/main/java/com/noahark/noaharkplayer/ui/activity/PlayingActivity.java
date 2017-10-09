@@ -39,11 +39,6 @@ public class PlayingActivity extends BaseActivity {
     };
 
     @Override
-    public void initData() {
-
-    }
-
-    @Override
     public void initView() {
         PlayingFragment playingFragment = new PlayingFragment_();
         PlayingListFragment playingListFragment = new PlayingListFragment_();

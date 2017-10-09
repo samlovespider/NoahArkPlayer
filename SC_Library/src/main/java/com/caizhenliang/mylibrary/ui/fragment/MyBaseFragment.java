@@ -1,14 +1,12 @@
-package com.caizhenliang.mylibrary.ui.activity;
+package com.caizhenliang.mylibrary.ui.fragment;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
+import android.support.v4.app.Fragment;
 
-import com.caizhenliang.mylibrary.Imp.MyBaseActivityImp;
 import com.caizhenliang.mylibrary.Imp.MyBaseBusImp;
+import com.caizhenliang.mylibrary.Imp.MyBaseFragmentImp;
 import com.caizhenliang.mylibrary.Imp.MyBaseHttpImp;
 import com.caizhenliang.mylibrary.Imp.MyClickImp;
 import com.caizhenliang.mylibrary.Imp.MyLogImp;
@@ -23,43 +21,33 @@ import com.loopj.android.http.RequestParams;
 import org.greenrobot.eventbus.Subscribe;
 
 /**
- * @author caizhenliang
+ * Created by caizhenliang on 2017/10/9.
+ * samcai
  */
-abstract public class MyBaseActivity extends AppCompatActivity implements MyBaseActivityImp, MyClickImp, MyLogImp, MyBaseHttpImp, MyBaseBusImp {
+abstract public class MyBaseFragment extends Fragment implements MyBaseFragmentImp, MyClickImp, MyLogImp, MyBaseHttpImp, MyBaseBusImp {
 
     //
     protected String TAG = getClass().getSimpleName();
     //
-    protected ActionBar mActionBar;
     protected MyAlertDialogTool mAlertDialogTool;//use to create alertdialog
     protected ACache mACache;
     protected AsyncHttpClient mHttpClient;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // init AlertDialog
-        mAlertDialogTool = new MyAlertDialogTool(getBaseContext());
-        // init ActionBar
-        mActionBar = getSupportActionBar();
+        mAlertDialogTool = new MyAlertDialogTool(getActivity().getBaseContext());
         // init Eventbus
         SCBus.getInstance().register(this);
         // init ACache
-        mACache = ACache.get(getBaseContext());
+        mACache = ACache.get(getActivity().getBaseContext());
         // init AsyncHttpClient
         mHttpClient = new AsyncHttpClient();
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            onBackPressed();
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
+    public void onDestroy() {
         super.onDestroy();
         SCBus.getInstance().unregister(this);
     }
@@ -87,7 +75,7 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
 
     @Override
     public void gotoActivityForResult(Class<?> paramClass, Bundle bundle, int paramInt) {
-        Intent lIntent = new Intent(this.getBaseContext(), paramClass);
+        Intent lIntent = new Intent(getActivity().getBaseContext(), paramClass);
         if (bundle != null) {
             lIntent.putExtras(bundle);
             lIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -102,7 +90,7 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
      * @param bundle     Bundle参数
      */
     private void doGotoActivity(Class<?> paramClass, Bundle bundle) {
-        Intent lIntent = new Intent(this.getBaseContext(), paramClass);
+        Intent lIntent = new Intent(getActivity().getBaseContext(), paramClass);
         if (bundle != null) {
             lIntent.putExtras(bundle);
             lIntent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -119,7 +107,7 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
      * @see Intent
      */
     private void doGotoActivity(Class<?> paramClass, Bundle bundle, int intentFlag) {
-        Intent lIntent = new Intent(this.getBaseContext(), paramClass);
+        Intent lIntent = new Intent(getActivity().getBaseContext(), paramClass);
         if (bundle != null) {
             lIntent.putExtras(bundle);
             lIntent.addFlags(intentFlag);
@@ -131,12 +119,12 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
 
     @Override
     public void get(String url, RequestParams requestParams, AsyncHttpResponseHandler asyncHttpResponseHandler) {
-        mHttpClient.get(this, url, requestParams, asyncHttpResponseHandler);
+        mHttpClient.get(getActivity(), url, requestParams, asyncHttpResponseHandler);
     }
 
     @Override
     public void post(String url, RequestParams requestParams, AsyncHttpResponseHandler asyncHttpResponseHandler) {
-        mHttpClient.post(this, url, requestParams, asyncHttpResponseHandler);
+        mHttpClient.post(getActivity(), url, requestParams, asyncHttpResponseHandler);
     }
 
     //-- MyBaseBusImp **--**--**--**--**--**--**--**--**--**--**--**--**--**--**--**

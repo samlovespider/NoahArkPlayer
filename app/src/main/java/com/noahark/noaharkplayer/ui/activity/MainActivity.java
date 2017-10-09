@@ -45,13 +45,8 @@ public class MainActivity extends BaseActivity {
     private List<MusicModel> mMusicList;
 
     @Override
-    public void initData() {
-        mMusicList = getMusics();
-    }
-
-
-    @Override
     public void initView() {
+        mMusicList = getMusics();
         MusicListAdapter musicListAdapter = new MusicListAdapter(this, mMusicList);
         lvMusics.setAdapter(musicListAdapter);
     }
