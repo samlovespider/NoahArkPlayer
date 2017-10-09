@@ -10,7 +10,7 @@ public class MusicModel implements Serializable {
 
     public String mID;//for test 13.22
     public String mData;// frank know
-    public String mName;
+    public String mName;// frank1
     public String mAlbum;
     public String mArtist;
     public String mDuration;
