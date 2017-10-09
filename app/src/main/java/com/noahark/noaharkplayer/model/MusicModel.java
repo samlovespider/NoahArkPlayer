@@ -9,8 +9,8 @@ import java.io.Serializable;
 public class MusicModel implements Serializable {
 
     public String mID;//for test 13.22
-    public String mData;// frank know
-    public String mName;
+    public String mData;
+    public String mName;// samcai edit
     public String mAlbum;
     public String mArtist;
     public String mDuration;
