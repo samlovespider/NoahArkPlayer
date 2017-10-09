@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class MusicModel implements Serializable {
 
     public String mID;//for test 13.22
-    public String mData;
+    public String mData;// frank know
     public String mName;
     public String mAlbum;
     public String mArtist;
