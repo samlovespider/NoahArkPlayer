@@ -17,6 +17,8 @@ import com.noahark.noaharkplayer.R;
 import com.noahark.noaharkplayer.adapter.MusicListAdapter;
 import com.noahark.noaharkplayer.base.ui.BaseActivity;
 import com.noahark.noaharkplayer.model.MusicModel;
+import com.noahark.noaharkplayer.util.ImageLoadTask;
+import com.noahark.noaharkplayer.util.LoadTaskListener;
 
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
@@ -39,16 +41,25 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.sbTime)
     SeekBar sbTime;
 
-    public static final String MUSIC_TIME = "com.laowang.music";
     private static final int CODE_FOR_WRITE_PERMISSION = 1;
 
     private List<MusicModel> mMusicList;
+    private ImageLoadTask mImageLoadTask;
 
     @Override
     public void initView() {
         mMusicList = getMusics();
-        MusicListAdapter musicListAdapter = new MusicListAdapter(this, mMusicList);
-        lvMusics.setAdapter(musicListAdapter);
+        if (mMusicList != null) {
+            mImageLoadTask = new ImageLoadTask(this, mMusicList);
+            mImageLoadTask.execute(mMusicList.toArray());
+            mImageLoadTask.setLoadTaskListener(new LoadTaskListener() {
+                @Override
+                public void loadTask(List<MusicModel> musicModels) {
+                    MusicListAdapter musicListAdapter = new MusicListAdapter(MainActivity.this, mMusicList);
+                    lvMusics.setAdapter(musicListAdapter);
+                }
+            });
+        }
     }
 
     @Override
@@ -57,10 +68,23 @@ public class MainActivity extends BaseActivity {
     }
 
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == MainActivity.CODE_FOR_WRITE_PERMISSION) {
+            if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                getMusics();
+            } else {
+                // failed
+                finish();
+            }
+        }
+    }
+
     /**
-     * get Images' information from MediaStore.Images.Media
+     * get musics' information from MediaStore.Audio.AudioColumns
      *
-     * @return
+     * @return List<MusicModel>
      */
     private List<MusicModel> getMusics() {
 
@@ -71,6 +95,7 @@ public class MainActivity extends BaseActivity {
                 MediaStore.Audio.AudioColumns.DATA, //
                 MediaStore.Audio.AudioColumns.DISPLAY_NAME, //
                 MediaStore.Audio.AudioColumns.ALBUM, //
+                MediaStore.Audio.AudioColumns.ALBUM_ID,//
                 MediaStore.Audio.AudioColumns.ARTIST, //
                 MediaStore.Audio.AudioColumns.DURATION, //
                 MediaStore.MediaColumns.SIZE //
@@ -94,6 +119,7 @@ public class MainActivity extends BaseActivity {
         String data;
         String name;
         String album;
+        String albumid;
         String artist;
         String duration;
         String size;
@@ -105,11 +131,12 @@ public class MainActivity extends BaseActivity {
             data = cursor.getString(1) == null ? "" : cursor.getString(1);
             name = cursor.getString(2) == null ? "" : cursor.getString(2);
             album = cursor.getString(3) == null ? "" : cursor.getString(3);
-            artist = cursor.getString(4) == null ? "" : cursor.getString(4);
-            duration = cursor.getString(5) == null ? "" : cursor.getString(5);
-            size = cursor.getString(6) == null ? "" : cursor.getString(6);
+            albumid = cursor.getString(4) == null ? "" : cursor.getString(4);
+            artist = cursor.getString(5) == null ? "" : cursor.getString(5);
+            duration = cursor.getString(6) == null ? "" : cursor.getString(6);
+            size = cursor.getString(7) == null ? "" : cursor.getString(7);
             //
-            MusicModel tmp = new MusicModel(id, data, name, album, artist, duration, size);
+            MusicModel tmp = new MusicModel(id, data, name, album, albumid, artist, duration, size);
             logW(tmp);
             imageList.add(tmp);
             //
@@ -119,16 +146,5 @@ public class MainActivity extends BaseActivity {
         return imageList;
     }
 
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == MainActivity.CODE_FOR_WRITE_PERMISSION) {
-            if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                getMusics();
-            } else {
-                // failed
-                finish();
-            }
-        }
-    }
+
 }

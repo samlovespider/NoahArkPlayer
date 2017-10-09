@@ -49,9 +49,11 @@ dependencies {
     compile 'com.google.android.gms:play-services-plus:11.0.4'
     testCompile 'junit:junit:4.12'
     //---------------
-    compile project(':SC_Library')
-    //---------------
     // AndroidAnnotations
-    annotationProcessor "org.androidannotations:androidannotations:$AAVersion" //
-    compile "org.androidannotations:androidannotations-api:$AAVersion"
+    annotationProcessor "org.androidannotations:androidannotations:$AAVersion"//
+    compile "org.androidannotations:androidannotations-api:$AAVersion"//
+    //---------------
+    compile project(':SC_Library')
+    compile project(':SC_Emptylayout')
+    //---------------
 }

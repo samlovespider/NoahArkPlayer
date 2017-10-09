@@ -1,5 +1,7 @@
 package com.noahark.noaharkplayer.model;
 
+import android.graphics.Bitmap;
+
 import java.io.Serializable;
 
 /**
@@ -12,18 +14,35 @@ public class MusicModel implements Serializable {
     public String mData;
     public String mName;
     public String mAlbum;
+    public String mAlbumID;
     public String mArtist;
     public String mDuration;
     public String mSize;
+    public Bitmap mBitmap;
 
-    public MusicModel(String mID, String mData, String mName, String mAlbum, String mArtist, String mDuration, String mSize) {
-        this.mID = mID;
-        this.mData = mData;
-        this.mName = mName;
-        this.mAlbum = mAlbum;
-        this.mArtist = mArtist;
-        this.mDuration = mDuration;
-        this.mSize = mSize;
+
+    public MusicModel(String ID, String data, String name, String album, String albumID, String artist, String duration, String size) {
+        this.mID = ID;
+        this.mData = data;
+        this.mName = name;
+        this.mAlbum = album;
+        this.mAlbumID = albumID;
+        this.mArtist = artist;
+        this.mDuration = duration;
+        this.mSize = size;
+    }
+
+
+    public MusicModel(String ID, String data, String name, String album, String albumID, String artist, String duration, String size, Bitmap bitmap) {
+        this.mID = ID;
+        this.mData = data;
+        this.mName = name;
+        this.mAlbum = album;
+        this.mAlbumID = albumID;
+        this.mArtist = artist;
+        this.mDuration = duration;
+        this.mSize = size;
+        this.mBitmap = bitmap;
     }
 
     @Override
@@ -33,9 +52,14 @@ public class MusicModel implements Serializable {
                 ", mData='" + mData + '\'' +
                 ", mName='" + mName + '\'' +
                 ", mAlbum='" + mAlbum + '\'' +
+                ", mAlbumID='" + mAlbumID + '\'' +
                 ", mArtist='" + mArtist + '\'' +
                 ", mDuration='" + mDuration + '\'' +
                 ", mSize='" + mSize + '\'' +
                 '}';
+    }
+
+    public void setmBitmap(Bitmap mBitmap) {
+        this.mBitmap = mBitmap;
     }
 }

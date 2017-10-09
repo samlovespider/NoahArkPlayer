@@ -34,9 +34,10 @@ public class PlayingActivity extends BaseActivity {
     ViewPager vpPlaying;
 
     private ArrayList<Fragment> mFragments = new ArrayList<>();
-    private String[] mTitles = {
-            "热门", "iOS"
-    };
+
+//    protected PlayService mPlayService;
+
+
 
     @Override
     public void initView() {
@@ -48,7 +49,7 @@ public class PlayingActivity extends BaseActivity {
         MyPagerAdapter mMyPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), mFragments);
         vpPlaying.setAdapter(mMyPagerAdapter);
 
-        stlLay.setTabData(mTitles);
+        stlLay.setTabData(new String[]{"A","B"});
         stlLay.setOnTabSelectListener(new OnTabSelectListener() {
             @Override
             public void onTabSelect(int position) {

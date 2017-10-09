@@ -1,1 +1,1 @@
-include ':app', ':SC_Library'
+include ':app', ':SC_Library', ':SC_Emptylayout'

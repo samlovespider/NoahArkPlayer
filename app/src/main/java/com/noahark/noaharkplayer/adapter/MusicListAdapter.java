@@ -59,7 +59,11 @@ public class MusicListAdapter extends BaseAdapter {
         }
 
         MusicModel photoModel = mMusicList.get(position);
-        holder.imgPic.setImageResource(R.drawable.ic_empty_music_album);
+        if (photoModel.mBitmap != null) {
+            holder.imgPic.setImageBitmap(photoModel.mBitmap);
+        } else {
+            holder.imgPic.setImageResource(R.drawable.ic_empty_music_album);
+        }
         holder.tvName.setText(photoModel.mName);
         holder.tvAuther.setText(photoModel.mArtist);
 
