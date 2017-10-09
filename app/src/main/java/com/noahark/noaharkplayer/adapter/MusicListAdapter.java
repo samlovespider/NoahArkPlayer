@@ -50,16 +50,16 @@ public class MusicListAdapter extends BaseAdapter {
         if (view == null) {
             holder = new MusicItemHolder();
             view = LayoutInflater.from(mContext).inflate(R.layout.activity_main_list_item, null);
-            holder.imgPic = (ImageView) view.findViewById(R.id.imgPic);
-            holder.tvName = (TextView) view.findViewById(R.id.tvName);
-            holder.tvAuther = (TextView) view.findViewById(R.id.tvAuther);
+            holder.imgPic = view.findViewById(R.id.imgPic);
+            holder.tvName = view.findViewById(R.id.tvName);
+            holder.tvAuther = view.findViewById(R.id.tvAuther);
             view.setTag(holder);
         } else {
             holder = (MusicItemHolder) view.getTag();
         }
 
         MusicModel photoModel = mMusicList.get(position);
-//        holder.imgPic.setImageBitmap(photoModel.mBitmap);
+        holder.imgPic.setImageResource(R.drawable.ic_launcher);
         holder.tvName.setText(photoModel.mName);
         holder.tvAuther.setText(photoModel.mArtist);
 
