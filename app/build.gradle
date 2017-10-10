@@ -2,20 +2,6 @@ apply plugin: 'com.android.application'
 def AAVersion = '4.3.+'
 
 android {
-    signingConfigs {
-        release {
-            keyAlias 'samcaikey'
-            keyPassword '049895543'
-            storeFile file('./samcaiapp.jks')
-            storePassword '049895543'
-        }
-        debug {
-            keyAlias 'debug'
-            keyPassword '049895543'
-            storeFile file('./samcaiappdebug.jks')
-            storePassword '049895543'
-        }
-    }
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
     defaultConfig {
@@ -25,15 +11,10 @@ android {
         versionCode 2
         versionName "1.1"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
-        }
-        debug {
-            signingConfig signingConfigs.debug
         }
     }
 }

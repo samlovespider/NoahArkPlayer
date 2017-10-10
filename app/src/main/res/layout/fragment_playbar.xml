@@ -11,7 +11,7 @@
         android:layout_gravity="bottom">
 
         <ImageView
-            android:id="@+id/imageView"
+            android:id="@+id/iv_previous"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:clickable="true"
@@ -22,12 +22,14 @@
 
         </ImageView>
         <ImageView
+            android:id="@+id/iv_play"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_weight="1"
             android:clickable="true"
             app:srcCompat="@android:drawable/ic_media_play"/>
         <ImageView
+            android:id="@+id/iv_next"
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_weight="1"

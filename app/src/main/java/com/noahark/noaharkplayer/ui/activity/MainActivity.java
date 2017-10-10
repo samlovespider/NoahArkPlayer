@@ -21,6 +21,7 @@ import com.noahark.noaharkplayer.util.ImageLoadTask;
 import com.noahark.noaharkplayer.util.LoadTaskListener;
 
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -48,22 +49,25 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void initView() {
-        mMusicList = getMusics();
-        if (mMusicList != null) {
-            mImageLoadTask = new ImageLoadTask(this, mMusicList);
-            mImageLoadTask.execute(mMusicList.toArray());
-            mImageLoadTask.setLoadTaskListener(new LoadTaskListener() {
-                @Override
-                public void loadTask(List<MusicModel> musicModels) {
-                    MusicListAdapter musicListAdapter = new MusicListAdapter(MainActivity.this, mMusicList);
-                    lvMusics.setAdapter(musicListAdapter);
-                }
-            });
-        }
+        gotoActivity(PlayingActivity_.class);
+//
+//        mMusicList = getMusics();
+//        if (mMusicList != null) {
+//            mImageLoadTask = new ImageLoadTask(this, mMusicList);
+//            mImageLoadTask.execute(mMusicList.toArray());
+//            mImageLoadTask.setLoadTaskListener(new LoadTaskListener() {
+//                @Override
+//                public void loadTask(List<MusicModel> musicModels) {
+//                    MusicListAdapter musicListAdapter = new MusicListAdapter(MainActivity.this, mMusicList);
+//                    lvMusics.setAdapter(musicListAdapter);
+//                }
+//            });
+//        }
     }
 
+    @ItemClick(R.id.lvMusics)
     @Override
-    public void initClick(View view) {
+    public void initItemClick(Object object) {
         gotoActivity(PlayingActivity_.class);
     }
 
@@ -123,9 +127,11 @@ public class MainActivity extends BaseActivity {
         String artist;
         String duration;
         String size;
+        int count = 0;
         //
         cursor.moveToNext();
         while (!cursor.isAfterLast()) {
+            count++;
             //
             id = cursor.getString(0) == null ? "" : cursor.getString(0);
             data = cursor.getString(1) == null ? "" : cursor.getString(1);
@@ -141,6 +147,10 @@ public class MainActivity extends BaseActivity {
             imageList.add(tmp);
             //
             cursor.moveToNext();
+            if (count == 10) {
+                cursor.close();
+                return imageList;
+            }
         }
         cursor.close();
         return imageList;
