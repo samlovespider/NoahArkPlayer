@@ -3,7 +3,6 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingLeft="15dp"
     android:paddingRight="15dp">
 
     <LinearLayout
@@ -22,12 +21,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="music name"
-                android:textSize="25sp" />
+                android:textSize="20sp"
+                android:paddingTop="3sp"/>
 
             <TextView
                 android:id="@+id/tv_Artist"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:textSize="12sp"
                 android:text="Artist" />
         </LinearLayout>
 
@@ -37,7 +38,8 @@
             android:layout_height="match_parent"
             android:gravity="right|center_vertical"
             android:text="00:00"
-            android:textSize="10sp"/>
+            android:textSize="12sp"
+            android:paddingBottom="15sp"/>
 
 
     </LinearLayout>

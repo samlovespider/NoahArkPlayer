@@ -17,7 +17,7 @@
             android:clickable="true"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:paddingStart="60dp"
+            android:paddingLeft="60dp"
             app:srcCompat="@android:drawable/ic_media_previous">
 
         </ImageView>
@@ -35,6 +35,6 @@
             android:layout_weight="1"
             android:clickable="true"
             app:srcCompat="@android:drawable/ic_media_next"
-            android:paddingEnd="60dp"/>
+            android:paddingRight="60dp"/>
     </LinearLayout>
 </LinearLayout>
