@@ -1,40 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/linPlayBar"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="60dp"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom">
+        android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/iv_previous"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:clickable="true"
-            android:layout_gravity="center"
-            android:layout_weight="1"
-            android:paddingLeft="60dp"
-            app:srcCompat="@android:drawable/ic_media_previous">
-
-        </ImageView>
-        <ImageView
+        <ImageButton
             android:id="@+id/iv_play"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:clickable="true"
-            app:srcCompat="@android:drawable/ic_media_play"/>
-        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:background="@drawable/ic_music_next" />
+
+        <ImageButton
+            android:id="@+id/iv_previous"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toLeftOf="@+id/iv_play"
+            android:background="@drawable/selector_previous_bar" />
+
+        <ImageButton
             android:id="@+id/iv_next"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_weight="1"
-            android:clickable="true"
-            app:srcCompat="@android:drawable/ic_media_next"
-            android:paddingRight="60dp"/>
-    </LinearLayout>
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/iv_play"
+            android:background="@drawable/selector_next_bar" />
+    </RelativeLayout>
 </LinearLayout>

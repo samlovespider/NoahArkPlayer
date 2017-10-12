@@ -22,6 +22,7 @@
                 android:layout_height="wrap_content"
                 android:text="music name"
                 android:textSize="20sp"
+                android:textColor="@color/item_selector"
                 android:paddingTop="3sp"/>
 
             <TextView
