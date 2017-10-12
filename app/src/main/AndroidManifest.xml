@@ -3,7 +3,7 @@
           xmlns:tools="http://schemas.android.com/tools"
           package="com.noahark.noaharkplayer">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -20,17 +20,21 @@
         </activity>
         <activity android:name=".ui.activity.PlayingActivity_">
         </activity>
+        <activity android:name=".ui.activity.MusicActivity_">
+        </activity>
 
+        <service
+            android:name=".service.MusicService_"
+            android:exported="true"
+            android:label="@string/service_name"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="android.media.browse.MediaBrowserService"/>
+            </intent-filter>
+        </service>
 
-        <!--<service-->
-            <!--android:name=".service.MusicService"-->
-            <!--android:exported="true"-->
-            <!--android:label="@string/service_name"-->
-            <!--tools:ignore="ExportedService">-->
-            <!--<intent-filter>-->
-                <!--<action android:name="android.media.browse.MediaBrowserService"/>-->
-            <!--</intent-filter>-->
-        <!--</service>-->
+        <activity android:name=".ui.activity.MusicActivity">
+        </activity>
     </application>
 
 </manifest>

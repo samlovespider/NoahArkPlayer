@@ -2,39 +2,24 @@ apply plugin: 'com.android.application'
 def AAVersion = '4.3.+'
 
 android {
-    signingConfigs {
-        release {
-            keyAlias 'samcaikey'
-            keyPassword '049895543'
-            storeFile file('./samcaiapp.jks')
-            storePassword '049895543'
-        }
-        debug {
-            keyAlias 'debug'
-            keyPassword '049895543'
-            storeFile file('./samcaiappdebug.jks')
-            storePassword '049895543'
-        }
-    }
     compileSdkVersion 26
     buildToolsVersion "26.0.1"
     defaultConfig {
         applicationId "com.noahark.noaharkplayer"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
-        debug {
-            signingConfig signingConfigs.debug
-        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 }
 
@@ -50,8 +35,10 @@ dependencies {
     testCompile 'junit:junit:4.12'
     //---------------
     // AndroidAnnotations
-    annotationProcessor "org.androidannotations:androidannotations:$AAVersion"//
-    compile "org.androidannotations:androidannotations-api:$AAVersion"//
+    annotationProcessor "org.androidannotations:androidannotations:$AAVersion"
+    //
+    compile "org.androidannotations:androidannotations-api:$AAVersion"
+    //
     //---------------
     compile project(':SC_Library')
     compile project(':SC_Emptylayout')

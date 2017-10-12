@@ -9,22 +9,36 @@
         android:id="@+id/imgPic"
         android:layout_width="70dp"
         android:layout_height="70dp"
-        android:layout_margin="10dp"
+        android:layout_alignLeft="@+id/tvSongName"
+        android:layout_alignStart="@+id/tvSongName"
+        android:layout_below="@+id/tvSongName"
+        android:paddingLeft="8sp"
+        android:paddingRight="8sp"
         android:src="@drawable/ic_launcher"/>
 
-    <TextView
-        android:id="@+id/tvName"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:maxLength="10"
-        android:text="音乐名称"/>
+        android:layout_height="50dp"
+        android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tvAuther"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="5dp"
-        android:maxLength="10"
-        android:text="作家"/>
+        <TextView
+            android:id="@+id/tvSongName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:maxLength="100"
+            android:paddingLeft="8sp"
+            android:paddingTop="3sp"
+            android:text="Song Name"
+            android:textSize="20sp"/>
+
+        <TextView
+            android:id="@+id/tvAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:maxLength="50"
+            android:paddingLeft="8sp"
+            android:text="Author"
+            android:textSize="15sp"/>
+    </LinearLayout>
+
 </LinearLayout>

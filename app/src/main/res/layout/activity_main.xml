@@ -6,14 +6,37 @@
     android:layout_height="match_parent"
     tools:context="com.noahark.noaharkplayer.ui.activity.MainActivity">
 
+    <LinearLayout
+        android:id="@+id/lin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/btnPeter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Peter"/>
+
+        <Button
+            android:id="@+id/btnSam"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Sam"/>
+
+        <Button
+            android:id="@+id/btnFrank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Frank"/>
+    </LinearLayout>
+
     <ListView
         android:id="@+id/lvMusics"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/linController"
-        android:background="#ffffff"
-        android:cacheColorHint="#00000000"
-        android:divider="@null"/>
+        android:layout_below="@+id/lin"/>
 
     <LinearLayout
         android:id="@+id/linController"
