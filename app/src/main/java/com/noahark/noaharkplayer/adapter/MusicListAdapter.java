@@ -51,8 +51,8 @@ public class MusicListAdapter extends BaseAdapter {
             holder = new MusicItemHolder();
             view = LayoutInflater.from(mContext).inflate(R.layout.activity_main_list_item, null);
             holder.imgPic = view.findViewById(R.id.imgPic);
-            holder.tvName = view.findViewById(R.id.tvName);
-            holder.tvAuther = view.findViewById(R.id.tvAuther);
+            holder.tvSongName = view.findViewById(R.id.tvSongName);
+            holder.tvAuthor = view.findViewById(R.id.tvAuthor);
             view.setTag(holder);
         } else {
             holder = (MusicItemHolder) view.getTag();
@@ -64,15 +64,15 @@ public class MusicListAdapter extends BaseAdapter {
         } else {
             holder.imgPic.setImageResource(R.drawable.ic_empty_music_album);
         }
-        holder.tvName.setText(photoModel.mName);
-        holder.tvAuther.setText(photoModel.mArtist);
+        holder.tvSongName.setText(photoModel.mName);
+        holder.tvAuthor.setText(photoModel.mArtist);
 
         return view;
     }
 
     private class MusicItemHolder {
         ImageView imgPic;
-        TextView tvName;
-        TextView tvAuther;
+        TextView tvSongName;
+        TextView tvAuthor;
     }
 }
