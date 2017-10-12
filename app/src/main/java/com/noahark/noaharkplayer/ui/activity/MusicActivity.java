@@ -10,7 +10,6 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.noahark.noaharkplayer.R;
-import com.noahark.noaharkplayer.adapter.MusicListAdapter;
 import com.noahark.noaharkplayer.base.ui.BaseActivity;
 import com.noahark.noaharkplayer.model.MusicModel;
 import com.noahark.noaharkplayer.service.MusicService;
@@ -43,8 +42,8 @@ public class MusicActivity extends BaseActivity {
                     CODE_FOR_WRITE_PERMISSION);
         }
 
-        MusicListAdapter musicListAdapter = new MusicListAdapter(this, mMusicList);
-        lvMusics.setAdapter(musicListAdapter);
+//        MusicListAdapter musicListAdapter = new MusicListAdapter(this, mMusicList);
+//        lvMusics.setAdapter(musicListAdapter);
     }
 
     @Override

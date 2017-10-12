@@ -67,6 +67,7 @@ public class MusicListAdapter extends BaseAdapter {
         holder.tvSongName.setText(photoModel.mName);
         holder.tvAuthor.setText(photoModel.mArtist);
 
+
         return view;
     }
 

@@ -1,5 +1,6 @@
 package com.noahark.noaharkplayer.ui.activity;
 
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -9,8 +10,8 @@ import com.noahark.noaharkplayer.R;
 import com.noahark.noaharkplayer.adapter.MusicListAdapter;
 import com.noahark.noaharkplayer.base.ui.BaseActivity;
 import com.noahark.noaharkplayer.model.MusicModel;
-import com.noahark.noaharkplayer.util.ImageLoadTask;
 
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 
@@ -32,14 +33,11 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.sbTime)
     SeekBar sbTime;
 
-    private static final int CODE_FOR_WRITE_PERMISSION = 1;
-
     private List<MusicModel> mMusicList;
-    private ImageLoadTask mImageLoadTask;
 
     @Override
     public void initView() {
-        gotoActivity(MusicActivity_.class);
+//        gotoActivity(MusicActivity_.class);
 //        mMusicList = getMusics();
 //        if (mMusicList != null) {
 //            mImageLoadTask = new ImageLoadTask(this, mMusicList);
@@ -52,7 +50,22 @@ public class MainActivity extends BaseActivity {
 //                }
 //            });
 //        }
-//        setList();
+        setList();
+    }
+
+    @Click({R.id.btnPeter, R.id.btnSam, R.id.btnFrank})
+    @Override
+    public void initClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnPeter:
+                break;
+            case R.id.btnSam:
+                gotoActivity(MusicActivity_.class);
+                break;
+            case R.id.btnFrank:
+                gotoActivity(PlayingActivity_.class);
+                break;
+        }
     }
 
     private void setList() {
@@ -64,5 +77,6 @@ public class MainActivity extends BaseActivity {
         MusicListAdapter musicListAdapter = new MusicListAdapter(this, mMusicList);
         lvMusics.setAdapter(musicListAdapter);
     }
+
 
 }

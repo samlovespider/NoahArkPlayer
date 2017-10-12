@@ -19,6 +19,7 @@ public class MusicModel implements Serializable {
     public String mDuration;
     public String mSize;
     public Bitmap mBitmap;
+    public boolean isPlaying;
 
 
     public MusicModel(String ID, String data, String name, String album, String albumID, String artist, String duration, String size) {
