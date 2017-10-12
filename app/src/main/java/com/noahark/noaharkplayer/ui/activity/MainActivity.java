@@ -12,7 +12,6 @@ import com.noahark.noaharkplayer.model.MusicModel;
 import com.noahark.noaharkplayer.util.ImageLoadTask;
 
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -34,10 +33,9 @@ public class MainActivity extends BaseActivity {
     SeekBar sbTime;
 
     private static final int CODE_FOR_WRITE_PERMISSION = 1;
+
     private List<MusicModel> mMusicList;
     private ImageLoadTask mImageLoadTask;
-
-
 
     @Override
     public void initView() {
@@ -57,7 +55,6 @@ public class MainActivity extends BaseActivity {
 //        setList();
     }
 
-
     private void setList() {
         mMusicList = new ArrayList<>();
         for (int i = 0; i < 20; i++) {
@@ -66,12 +63,6 @@ public class MainActivity extends BaseActivity {
         }
         MusicListAdapter musicListAdapter = new MusicListAdapter(this, mMusicList);
         lvMusics.setAdapter(musicListAdapter);
-    }
-
-
-    @ItemClick(R.id.lvMusics)
-    @Override
-    public void initItemClick(Object object) {
     }
 
 }
