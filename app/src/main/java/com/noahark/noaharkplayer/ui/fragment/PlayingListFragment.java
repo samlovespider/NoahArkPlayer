@@ -69,7 +69,7 @@ public class PlayingListFragment extends BaseFragment {
 
     private boolean isPlaying = false;
 
-    @Click({R.id.iv_play})
+    @Click({R.id.iv_play,R.id.iv_next,R.id.iv_previous})
     @Override
     public void initClick(View view) {
         Toast.makeText(getContext(), "play:" + isPlaying, Toast.LENGTH_SHORT).show();
@@ -77,10 +77,10 @@ public class PlayingListFragment extends BaseFragment {
         switch (view.getId()) {
             case R.id.iv_play:
                 if (isPlaying) {
-//                    view.setBackgroundResource(R.drawable.selector_play_bar);
+                    view.setBackgroundResource(R.drawable.ic_music_play);
                     isPlaying = false;
                 } else {
-//                    view.setBackgroundResource(R.drawable.selector_pause_bar);
+                    view.setBackgroundResource(R.drawable.ic_music_pause);
                     isPlaying = true;
                 }
                 break;
