@@ -1,15 +1,18 @@
 package com.noahark.noaharkplayer.adapter;
 
 import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.noahark.noaharkplayer.R;
 import com.noahark.noaharkplayer.model.MusicModel;
+import com.noahark.noaharkplayer.ui.activity.PlayingActivity;
 
 import java.util.List;
 
@@ -58,15 +61,20 @@ public class MusicListAdapter extends BaseAdapter {
             holder = (MusicItemHolder) view.getTag();
         }
 
-        MusicModel photoModel = mMusicList.get(position);
-        if (photoModel.mBitmap != null) {
-            holder.imgPic.setImageBitmap(photoModel.mBitmap);
+        MusicModel musicModel = mMusicList.get(position);
+        if (musicModel.mBitmap != null) {
+            holder.imgPic.setImageBitmap(musicModel.mBitmap);
         } else {
             holder.imgPic.setImageResource(R.drawable.ic_empty_music_album);
         }
-        holder.tvSongName.setText(photoModel.mName);
-        holder.tvAuthor.setText(photoModel.mArtist);
+        holder.tvSongName.setText(musicModel.mName);
+        holder.tvAuthor.setText(musicModel.mArtist);
 
+        if (musicModel.isPlaying) {
+            holder.ivPlaying.setVisibility(View.VISIBLE);
+        }else{
+            holder.ivPlaying.setVisibility(View.INVISIBLE);
+        }
 
         return view;
     }
@@ -75,5 +83,6 @@ public class MusicListAdapter extends BaseAdapter {
         ImageView imgPic;
         TextView tvSongName;
         TextView tvAuthor;
+        ImageView ivPlaying;
     }
 }
