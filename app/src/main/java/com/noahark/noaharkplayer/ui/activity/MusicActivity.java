@@ -11,9 +11,11 @@ import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.noahark.noaharkplayer.R;
 import com.noahark.noaharkplayer.adapter.MusicListAdapter;
@@ -21,6 +23,7 @@ import com.noahark.noaharkplayer.base.ui.BaseActivity;
 import com.noahark.noaharkplayer.model.MusicModel;
 import com.noahark.noaharkplayer.service.MusicService;
 
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
@@ -68,21 +71,32 @@ public class MusicActivity extends BaseActivity {
         setReceiver();
     }
 
+
+    @Click({R.id.btnStop})
+    @Override
+    public void initClick(View view) {
+        switch (view.getId()) {
+            case R.id.btnStop:
+                //TODO implement
+                break;
+        }
+    }
+
     @ItemClick(R.id.lvMusics)
     @Override
     public void initItemClick(int position) {
         MusicModel musicModel = mMusicList.get(position);
         if (musicModel.isPlaying) {
             musicModel.isPlaying = false;
-            pausePlay();
+            pause();
         } else {
             musicModel.isPlaying = true;
             //
             if (mLastPaly != position) {
                 mLastPaly = position;
-                startPlay(musicModel.mData, position);
+                play();
             } else {
-                resumePlay();
+                resume();
             }
         }
         mMusicListAdapter.notifyDataSetChanged();
@@ -202,27 +216,68 @@ public class MusicActivity extends BaseActivity {
         return min + ":" + sec.trim().substring(0, 2);
     }
 
-    private void startPlay(String data, int position) {
-        startIntent(MusicService.PLY_PLAY, data, position);
+    private void play() {
+        MusicModel mp3Info = mMusicList.get(0);
+        startIntent(0, mp3Info.mData, MusicService.PLY_PLAY);
     }
 
-    private void resumePlay() {
-        startIntent(MusicService.PLY_CONTINUE, "", -1);
+    private void pause() {
+        startIntent(-1, "", MusicService.PLY_PAUSE);
     }
 
-    private void pausePlay() {
-        startIntent(MusicService.PLY_PAUSE, "", -1);
+    private void resume() {
+        MusicModel mp3Info = mMusicList.get(mListPosition);
+        startIntent(mListPosition, mp3Info.mData, MusicService.PLY_CONTINUE);
     }
 
-    private void stopPlay() {
-        startIntent(MusicService.PLY_STOP, "", -1);
+    private void next() {
+        mListPosition = mListPosition + 1;
+        if (mListPosition <= mMusicList.size() - 1) {
+            MusicModel mp3Info = mMusicList.get(mListPosition);
+            startIntent(mListPosition, mp3Info.mData, MusicService.PLY_NEXT);
+        } else {
+            Toast.makeText(this, "This is the last Song!", Toast.LENGTH_SHORT).show();
+        }
     }
 
-    private void startIntent(int action, String data, int position) {
+    private void previous() {
+        mListPosition = mListPosition - 1;
+        if (mListPosition >= 0) {
+            MusicModel mp3Info = mMusicList.get(mListPosition);
+            startIntent(mListPosition, mp3Info.mData, MusicService.PLY_PRIVIOUS);
+        } else {
+            Toast.makeText(this, "This is the first Song!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void repeat_one() {
+        setBroadcast(MusicService.STATUS_SINGLE);
+    }
+
+    private void repeat_all() {
+        setBroadcast(MusicService.STATUS_LOOP_ALL);
+    }
+
+    private void repeat_none() {
+        setBroadcast(MusicService.STATUS_BY_ORDER);
+    }
+
+    private void shuffleMusic() {
+        setBroadcast(MusicService.STATUS_BY_RANDOM);
+    }
+
+    private void setBroadcast(int status) {
+        Intent intent = new Intent(MusicService.ACTION_CTL_ACTION);
+        intent.putExtra(MusicService.STATUS, status);
+        sendBroadcast(intent);
+    }
+
+    private void startIntent(int position, String data, int action) {
         Intent intent = new Intent(this, MusicService.class);
-        intent.putExtra(MusicService.PLY_ACTION, action);
-        intent.putExtra(MusicService.PLY_DATA, data);
+        intent.setAction("android.media.browse.MediaBrowserService");
         intent.putExtra(MusicService.PLY_POSITION, position);
+        intent.putExtra(MusicService.PLY_DATA, data);
+        intent.putExtra(MusicService.PLY_ACTION, action);
         startService(intent);
     }
 
@@ -231,22 +286,22 @@ public class MusicActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-//            String action = intent.getAction();
-//            if (action.equals(MusicService.ACTION_MUSIC_CURRENT)) {
+            String action = intent.getAction();
+            if (action.equals(MusicService.ACTION_MUSIC_CURRENT)) {
 //                //currentTime代表当前播放的时间
 //                mCurrentTime = intent.getIntExtra(MusicService.PLY_CURRENT_TIME, -1);
 //                tvCurrentTime.setText(mCurrentTime);
 //
-//            } else if (action.equals(MusicService.ACTION_MUSIC_DURATION)) {
+            } else if (action.equals(MusicService.ACTION_MUSIC_DURATION)) {
 //                mDuration = intent.getIntExtra(MusicService.PLY_DURATION, -1);
 //
-//            } else if (action.equals(MusicService.ACTION_UPDATE_ACTION)) {
+            } else if (action.equals(MusicService.ACTION_UPDATE_ACTION)) {
 //                //获取Intent中的current消息，current代表当前正在播放的歌曲
 //                mListPosition = intent.getIntExtra(MusicService.PLY_POSITION, -1);
 //                if (mListPosition >= 0) {
 //                    musicTitle.setText(mp3Infos.get(mListPosition).getTitle());
 //                }
-//            } else if (action.equals(MusicService.ACTION_REPEAT_ACTION)) {
+            } else if (action.equals(MusicService.ACTION_REPEAT_ACTION)) {
 //                mRepeatState = intent.getIntExtra(MusicService.STATUS, -1);
 //                switch (mRepeatState) {
 //                    case MusicService.STATUS_SINGLE: // 单曲循环
@@ -262,7 +317,7 @@ public class MusicActivity extends BaseActivity {
 //                        shuffleBtn.setClickable(true);
 //                        break;
 //                }
-//            } else if (action.equals(MusicService.ACTION_SHUFFLE_ACTION)) {
+            } else if (action.equals(MusicService.ACTION_SHUFFLE_ACTION)) {
 //                isShuffle = intent.getBooleanExtra("shuffleState", false);
 //                if (isShuffle) {
 //                    isNoneShuffle = false;
@@ -273,7 +328,8 @@ public class MusicActivity extends BaseActivity {
 //                    shuffleBtn.setBackgroundResource(R.drawable.shuffle_none_selector);
 //                    repeatBtn.setClickable(true);
 //                }
-//            }
+            }
         }
     }
+
 }

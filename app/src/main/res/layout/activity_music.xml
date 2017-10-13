@@ -6,6 +6,12 @@
     android:layout_height="match_parent"
     tools:context="com.noahark.noaharkplayer.ui.activity.MusicActivity">
 
+    <Button
+        android:id="@+id/btnStop"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="stop"/>
+
     <ListView
         android:id="@+id/lvMusics"
         android:layout_width="match_parent"
