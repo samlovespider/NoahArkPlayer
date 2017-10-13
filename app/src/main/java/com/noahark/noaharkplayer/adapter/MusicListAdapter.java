@@ -56,6 +56,7 @@ public class MusicListAdapter extends BaseAdapter {
             holder.imgPic = view.findViewById(R.id.imgPic);
             holder.tvSongName = view.findViewById(R.id.tvSongName);
             holder.tvAuthor = view.findViewById(R.id.tvAuthor);
+            holder.ivPlaying= view.findViewById(R.id.ivPlaying);
             view.setTag(holder);
         } else {
             holder = (MusicItemHolder) view.getTag();
