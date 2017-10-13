@@ -231,49 +231,49 @@ public class MusicActivity extends BaseActivity {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (action.equals(MusicService.ACTION_MUSIC_CURRENT)) {
-                //currentTime代表当前播放的时间
-                mCurrentTime = intent.getIntExtra(MusicService.PLY_CURRENT_TIME, -1);
-                tvCurrentTime.setText(mCurrentTime);
-
-            } else if (action.equals(MusicService.ACTION_MUSIC_DURATION)) {
-                mDuration = intent.getIntExtra(MusicService.PLY_DURATION, -1);
-
-            } else if (action.equals(MusicService.ACTION_UPDATE_ACTION)) {
-                //获取Intent中的current消息，current代表当前正在播放的歌曲
-                mListPosition = intent.getIntExtra(MusicService.PLY_POSITION, -1);
-                if (mListPosition >= 0) {
-                    musicTitle.setText(mp3Infos.get(mListPosition).getTitle());
-                }
-            } else if (action.equals(MusicService.ACTION_REPEAT_ACTION)) {
-                mRepeatState = intent.getIntExtra(MusicService.STATUS, -1);
-                switch (mRepeatState) {
-                    case MusicService.STATUS_SINGLE: // 单曲循环
-                        repeatBtn.setBackgroundResource(R.drawable.repeat_current_selector);
-                        shuffleBtn.setClickable(false);
-                        break;
-                    case MusicService.STATUS_LOOP_ALL: // 全部循环
-                        repeatBtn.setBackgroundResource(R.drawable.repeat_all_selector);
-                        shuffleBtn.setClickable(false);
-                        break;
-                    case MusicService.STATUS_BY_ORDER: // 无重复
-                        repeatBtn.setBackgroundResource(R.drawable.repeat_none_selector);
-                        shuffleBtn.setClickable(true);
-                        break;
-                }
-            } else if (action.equals(MusicService.ACTION_SHUFFLE_ACTION)) {
-                isShuffle = intent.getBooleanExtra("shuffleState", false);
-                if (isShuffle) {
-                    isNoneShuffle = false;
-                    shuffleBtn.setBackgroundResource(R.drawable.shuffle_selector);
-                    repeatBtn.setClickable(false);
-                } else {
-                    isNoneShuffle = true;
-                    shuffleBtn.setBackgroundResource(R.drawable.shuffle_none_selector);
-                    repeatBtn.setClickable(true);
-                }
-            }
+//            String action = intent.getAction();
+//            if (action.equals(MusicService.ACTION_MUSIC_CURRENT)) {
+//                //currentTime代表当前播放的时间
+//                mCurrentTime = intent.getIntExtra(MusicService.PLY_CURRENT_TIME, -1);
+//                tvCurrentTime.setText(mCurrentTime);
+//
+//            } else if (action.equals(MusicService.ACTION_MUSIC_DURATION)) {
+//                mDuration = intent.getIntExtra(MusicService.PLY_DURATION, -1);
+//
+//            } else if (action.equals(MusicService.ACTION_UPDATE_ACTION)) {
+//                //获取Intent中的current消息，current代表当前正在播放的歌曲
+//                mListPosition = intent.getIntExtra(MusicService.PLY_POSITION, -1);
+//                if (mListPosition >= 0) {
+//                    musicTitle.setText(mp3Infos.get(mListPosition).getTitle());
+//                }
+//            } else if (action.equals(MusicService.ACTION_REPEAT_ACTION)) {
+//                mRepeatState = intent.getIntExtra(MusicService.STATUS, -1);
+//                switch (mRepeatState) {
+//                    case MusicService.STATUS_SINGLE: // 单曲循环
+//                        repeatBtn.setBackgroundResource(R.drawable.repeat_current_selector);
+//                        shuffleBtn.setClickable(false);
+//                        break;
+//                    case MusicService.STATUS_LOOP_ALL: // 全部循环
+//                        repeatBtn.setBackgroundResource(R.drawable.repeat_all_selector);
+//                        shuffleBtn.setClickable(false);
+//                        break;
+//                    case MusicService.STATUS_BY_ORDER: // 无重复
+//                        repeatBtn.setBackgroundResource(R.drawable.repeat_none_selector);
+//                        shuffleBtn.setClickable(true);
+//                        break;
+//                }
+//            } else if (action.equals(MusicService.ACTION_SHUFFLE_ACTION)) {
+//                isShuffle = intent.getBooleanExtra("shuffleState", false);
+//                if (isShuffle) {
+//                    isNoneShuffle = false;
+//                    shuffleBtn.setBackgroundResource(R.drawable.shuffle_selector);
+//                    repeatBtn.setClickable(false);
+//                } else {
+//                    isNoneShuffle = true;
+//                    shuffleBtn.setBackgroundResource(R.drawable.shuffle_none_selector);
+//                    repeatBtn.setClickable(true);
+//                }
+//            }
         }
     }
 }
