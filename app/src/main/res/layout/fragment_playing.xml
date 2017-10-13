@@ -1,15 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.noahark.noaharkplayer.ui.fragment.PlayingFragment">
+    android:orientation="vertical">
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_music_name"
+                android:layout_gravity="center"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="music name"
+                android:textSize="25sp"
+                android:paddingTop="3sp"/>
+
+            <TextView
+                android:id="@+id/tv_Artist"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textSize="20sp"
+                android:text="Artist" />
+        </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:orientation="horizontal">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center|bottom"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp">
 
         <ImageButton
             android:id="@+id/ib_repeat"
@@ -20,9 +45,9 @@
         <View
             android:layout_width="1dp"
             android:layout_height="20dp"
-            android:layout_gravity="center"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
+            android:layout_marginBottom="13dp"
             android:background="@color/grey" />
 
         <ImageButton
@@ -34,9 +59,9 @@
         <View
             android:layout_width="1dp"
             android:layout_height="20dp"
-            android:layout_gravity="center"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
+            android:layout_marginBottom="13dp"
             android:background="@color/grey" />
 
         <ImageButton
@@ -45,4 +70,4 @@
             android:layout_height="wrap_content"
             android:background="@drawable/ic_music_favorite_normal" />
     </LinearLayout>
-</RelativeLayout>
+</LinearLayout>
