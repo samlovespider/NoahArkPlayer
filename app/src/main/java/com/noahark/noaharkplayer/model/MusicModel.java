@@ -21,6 +21,8 @@ public class MusicModel implements Serializable {
     public Bitmap mBitmap;
     public boolean isPlaying;
 
+    public MusicModel() {
+    }
 
     public MusicModel(String ID, String data, String name, String album, String albumID, String artist, String duration, String size) {
         this.mID = ID;

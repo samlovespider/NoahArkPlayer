@@ -41,6 +41,5 @@ dependencies {
     //
     //---------------
     compile project(':SC_Library')
-    compile project(':SC_Emptylayout')
     //---------------
 }
