@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tl="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/lib/co.ceryle"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.noahark.noaharkplayer.ui.activity.PlayingActivity">
@@ -16,7 +17,64 @@
         tl:tl_bar_color="#ffffff"
         tl:tl_indicator_color="@color/red"
         tl:tl_indicator_corner_radius="8dp"
+        tl:tl_divider_color="@color/green"
+        tl:tl_divider_width="50dp"
         tl:tl_tab_padding="5dp"/>
+
+<!--    <co.ceryle.segmentedbutton.SegmentedButtonGroup
+        android:id="@+id/sbgLay"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        app:sbg_animateSelector="bounce"
+        app:sbg_animateSelectorDuration="1000"
+        app:sbg_backgroundColor="@color/white"
+        app:sbg_dividerColor="@color/black"
+        app:sbg_dividerPadding="10dp"
+        app:sbg_dividerRadius="10dp"
+        app:sbg_dividerSize="1dp"
+        app:sbg_position="1"
+        app:sbg_radius="2dp"
+        app:sbg_ripple="true"
+        app:sbg_rippleColor="@color/violet"
+        app:sbg_selectorColor="@color/pink"
+        app:sbg_selectorTextColor="@color/black"
+        app:sbg_shadow="true"
+        app:sbg_shadowElevation="3dp"
+        app:sbg_shadowMargin="4dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="10dp"
+            android:text="Button 1"
+            android:textAllCaps="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="10dp"
+            android:text="Button 2"
+            android:textAllCaps="false" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="10dp"
+            android:text="Button 3"
+            android:textAllCaps="false" />
+
+    </co.ceryle.segmentedbutton.SegmentedButtonGroup>-->
+
+
+
+
+
+
+
+
+
+
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vpPlaying"
