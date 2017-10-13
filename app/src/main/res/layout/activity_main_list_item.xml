@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="wrap_content"
+              android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:gravity="center_vertical"
-              android:orientation="horizontal">
+              android:orientation="horizontal"
+              android:layout_marginTop="10dp">
 
     <ImageView
         android:id="@+id/imgPic"
@@ -26,6 +27,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:maxLength="100"
+            android:maxLines="1"
+            android:paddingStart="8sp"
+            android:paddingEnd="8sp"
             android:paddingLeft="8sp"
             android:paddingTop="3sp"
             android:text="Song Name"
@@ -36,9 +40,34 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:maxLength="50"
+            android:maxLines="1"
+            android:paddingStart="8sp"
+            android:paddingEnd="8sp"
             android:paddingLeft="8sp"
             android:text="Author"
             android:textSize="15sp"/>
     </LinearLayout>
+    
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="end">
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"/>
+
+        <ImageView
+            android:id="@+id/btnPlaying"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginEnd="10dp"
+            android:layout_marginRight="10dp"
+            android:background="@drawable/ic_music_play"
+            android:visibility="invisible"/>
+
+        </LinearLayout>
 
 </LinearLayout>
