@@ -34,8 +34,10 @@
     <ListView
         android:id="@+id/lvMusics"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/linController"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/ln_playbar"
         android:layout_below="@+id/lin"/>
+
+    <include layout="@layout/activity_main_playbar" />
 
 </RelativeLayout>
