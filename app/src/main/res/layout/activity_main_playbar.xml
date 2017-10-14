@@ -2,9 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/relPlayBar"
                 android:layout_width="match_parent"
-                android:background="@color/oldlace"
                 android:layout_height="wrap_content"
                 android:layout_alignParentBottom="true">
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0.5dp"
+        android:background="@color/darkgoldenrod"/>
 
     <ImageView
         android:id="@+id/ivAlbum"
@@ -54,9 +58,9 @@
 
         <TextView
             android:id="@+id/tvAuthor"
-            android:layout_marginTop="3dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
             android:gravity="center"
             android:maxLines="1"
             android:text="Fall Out Boy"

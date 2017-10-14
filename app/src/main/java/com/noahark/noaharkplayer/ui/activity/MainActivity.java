@@ -14,7 +14,6 @@ import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,6 +25,7 @@ import com.noahark.noaharkplayer.service.MusicService;
 
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.ItemClick;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.ArrayList;
@@ -42,8 +42,6 @@ public class MainActivity extends BaseActivity {
     @ViewById(R.id.lvMusics)
     ListView lvMusics;
     // playbar
-    @ViewById(R.id.relPlayBar)
-    RelativeLayout relPlayBar;
     @ViewById(R.id.ivAlbum)
     ImageView ivAlbum;
     @ViewById(R.id.tvMusicName)
@@ -53,15 +51,18 @@ public class MainActivity extends BaseActivity {
     //
     private MusicListAdapter mMusicListAdapter;
     private List<MusicModel> mMusicList;
-    private int mLastPaly = -1;
+    private int mLastPosition = -1;
     private int mRepeatState = MusicService.STATUS_SINGLE;
     private HomeReceiver mHomeReceiver;  //自定义的广播接收器
     private int mCurrentTime;
     private int mDuration;
     private int mListPosition = 0;   //标识列表位置
+    private boolean isPlaying;
 
     @Override
     public void initView() {
+
+        mActionBar.setTitle("ALL Songs");
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
@@ -72,26 +73,43 @@ public class MainActivity extends BaseActivity {
         setReceiver();
     }
 
-
-    @Click({R.id.btnPeter, R.id.btnSam, R.id.btnFrank, R.id.ibNext, R.id.ibPlay})
+    @Click({R.id.ibNext, R.id.ibPlay, R.id.relPlayBar})
     @Override
     public void initClick(View view) {
         switch (view.getId()) {
-            case R.id.btnPeter:
-                break;
-            case R.id.btnSam:
-                gotoActivity(MusicActivity_.class);
-                break;
-            case R.id.btnFrank:
-                gotoActivity(PlayingActivity_.class);
-                break;
             case R.id.ibNext:
                 //TODO implement
                 break;
             case R.id.ibPlay:
-                //TODO implement
+                if (isPlaying) {
+                    isPlaying = false;
+                    view.setBackgroundResource(R.drawable.ic_activity_main_bar_play_normal);
+                } else {
+                    isPlaying = true;
+                    view.setBackgroundResource(R.drawable.ic_activity_main_bar_pause_normal);
+                }
+                break;
+            case R.id.relPlayBar:
+                gotoActivity(PlayingActivity_.class);
                 break;
         }
+    }
+
+
+    @ItemClick(R.id.lvMusics)
+    @Override
+    public void initItemClick(int position) {
+        if (mLastPosition == position) {
+            mLastPosition = -1;
+            mMusicList.get(position).isPlaying = false;
+        } else {
+            if (mLastPosition != -1) {
+                mMusicList.get(mLastPosition).isPlaying = false;
+            }
+            mLastPosition = position;
+            mMusicList.get(position).isPlaying = true;
+        }
+        mMusicListAdapter.notifyDataSetChanged();
     }
 
     @Override

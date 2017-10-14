@@ -19,7 +19,7 @@ import org.androidannotations.annotations.EService;
 import java.util.List;
 import java.util.Random;
 
-import static com.noahark.noaharkplayer.ui.activity.MusicActivity.MUSICLIST;
+import static com.noahark.noaharkplayer.ui.activity.MainActivity.MUSICLIST;
 
 /**
  * @author caizhenliang

@@ -35,19 +35,6 @@ public class MusicModel implements Serializable {
         this.mSize = size;
     }
 
-
-    public MusicModel(String ID, String data, String name, String album, String albumID, String artist, String duration, String size, Bitmap bitmap) {
-        this.mID = ID;
-        this.mData = data;
-        this.mName = name;
-        this.mAlbum = album;
-        this.mAlbumID = albumID;
-        this.mArtist = artist;
-        this.mDuration = duration;
-        this.mSize = size;
-        this.mBitmap = bitmap;
-    }
-
     @Override
     public String toString() {
         return "MusicModel{" +
