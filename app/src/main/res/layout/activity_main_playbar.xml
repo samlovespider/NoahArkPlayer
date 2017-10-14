@@ -52,7 +52,6 @@
             android:layout_height="wrap_content"
             android:gravity="center"
             android:maxLines="1"
-            android:text="Centuries"
             android:textColor="@color/black"
             android:textSize="12sp"/>
 
@@ -63,7 +62,6 @@
             android:layout_marginTop="3dp"
             android:gravity="center"
             android:maxLines="1"
-            android:text="Fall Out Boy"
             android:textSize="9sp"/>
     </LinearLayout>
 </RelativeLayout>

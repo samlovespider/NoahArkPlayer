@@ -7,16 +7,20 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONArray;
+import com.caizhenliang.mylibrary.util.base.ACache;
 import com.noahark.noaharkplayer.R;
 import com.noahark.noaharkplayer.adapter.MusicListAdapter;
 import com.noahark.noaharkplayer.base.ui.BaseActivity;
@@ -31,13 +35,14 @@ import org.androidannotations.annotations.ViewById;
 import java.util.ArrayList;
 import java.util.List;
 
+
 @EActivity(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
 
     //
+    public static final String MUSIC_REPEAT_STATUS = "music_repeat_status";
     public static final String MUSICLIST = "musiclist";
     private static final int CODE_FOR_WRITE_PERMISSION = 1;
-
     //
     @ViewById(R.id.lvMusics)
     ListView lvMusics;
@@ -48,16 +53,16 @@ public class MainActivity extends BaseActivity {
     TextView tvMusicName;
     @ViewById(R.id.tvAuthor)
     TextView tvAuthor;
+    @ViewById(R.id.ibPlay)
+    ImageButton ibPlay;
     //
     private MusicListAdapter mMusicListAdapter;
     private List<MusicModel> mMusicList;
-    private int mLastPosition = -1;
-    private int mRepeatState = MusicService.STATUS_SINGLE;
     private HomeReceiver mHomeReceiver;  //自定义的广播接收器
-    private int mCurrentTime;
-    private int mDuration;
-    private int mListPosition = 0;   //标识列表位置
-    private boolean isPlaying;
+    private int mLastPosition = -1;
+    private int mRepeatState = MusicService.STATUS_BY_ORDER;
+
+    private Intent mServiceIntent;
 
     @Override
     public void initView() {
@@ -69,8 +74,16 @@ public class MainActivity extends BaseActivity {
                     CODE_FOR_WRITE_PERMISSION);
             return;
         }
+
         setList();
         setReceiver();
+
+        mCache.put(MUSIC_REPEAT_STATUS, mRepeatState);
+
+        getCache();
+        if (mLastPosition != -1) {
+            setPlayBarInfo(mMusicList.get(mLastPosition));
+        }
     }
 
     @Click({R.id.ibNext, R.id.ibPlay, R.id.relPlayBar})
@@ -78,15 +91,17 @@ public class MainActivity extends BaseActivity {
     public void initClick(View view) {
         switch (view.getId()) {
             case R.id.ibNext:
-                //TODO implement
+                next();
                 break;
             case R.id.ibPlay:
-                if (isPlaying) {
-                    isPlaying = false;
+                if (mMusicList.get(mLastPosition).isPlaying) {
+                    mMusicList.get(mLastPosition).isPlaying = false;
                     view.setBackgroundResource(R.drawable.ic_activity_main_bar_play_normal);
+                    pause();
                 } else {
-                    isPlaying = true;
+                    mMusicList.get(mLastPosition).isPlaying = true;
                     view.setBackgroundResource(R.drawable.ic_activity_main_bar_pause_normal);
+                    play(mLastPosition);
                 }
                 break;
             case R.id.relPlayBar:
@@ -95,11 +110,22 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-
     @ItemClick(R.id.lvMusics)
     @Override
     public void initItemClick(int position) {
-        controlListItemPlayIcon(position);
+        if (mLastPosition == position) {
+            mLastPosition = -1;
+            mMusicList.get(position).isPlaying = false;
+            pause();
+        } else {
+            if (mLastPosition != -1) {
+                mMusicList.get(mLastPosition).isPlaying = false;
+            }
+            mLastPosition = position;
+            mMusicList.get(position).isPlaying = true;
+            play(mLastPosition);
+        }
+        mMusicListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -115,30 +141,18 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    private void controlListItemPlayIcon(int position) {
-        if (mLastPosition == position) {
-            mLastPosition = -1;
-            mMusicList.get(position).isPlaying = false;
-        } else {
-            if (mLastPosition != -1) {
-                mMusicList.get(mLastPosition).isPlaying = false;
-            }
-            mLastPosition = position;
-            mMusicList.get(position).isPlaying = true;
-        }
-        mMusicListAdapter.notifyDataSetChanged();
-    }
-
     private void setReceiver() {
         mHomeReceiver = new HomeReceiver();
         // 创建IntentFilter
         IntentFilter filter = new IntentFilter();
         // 指定BroadcastReceiver监听的Action
-        filter.addAction(MusicService.ACTION_UPDATE_ACTION);
-        filter.addAction(MusicService.ACTION_MUSIC_CURRENT);
-        filter.addAction(MusicService.ACTION_MUSIC_DURATION);
-        filter.addAction(MusicService.ACTION_REPEAT_ACTION);
-        filter.addAction(MusicService.ACTION_SHUFFLE_ACTION);
+        filter.addAction(MusicService.BROADCAST_ACTION_NEXT_SONGS);
+        //
+//        filter.addAction(MusicService.ACTION_UPDATE_ACTION);
+//        filter.addAction(MusicService.ACTION_MUSIC_CURRENT);
+//        filter.addAction(MusicService.ACTION_MUSIC_DURATION);
+//        filter.addAction(MusicService.ACTION_REPEAT_ACTION);
+//        filter.addAction(MusicService.ACTION_SHUFFLE_ACTION);
         // 注册BroadcastReceiver
         registerReceiver(mHomeReceiver, filter);
     }
@@ -201,7 +215,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setCache(List<MusicModel> imageList) {
-        mCache.put(MUSICLIST, imageList);
+        mCache.put(MUSICLIST, JSONArray.toJSONString(imageList));
     }
 
     private String formatTime(long time) {
@@ -224,39 +238,68 @@ public class MainActivity extends BaseActivity {
         return min + ":" + sec.trim().substring(0, 2);
     }
 
-    private void play() {
-        MusicModel mp3Info = mMusicList.get(0);
-        startIntent(0, mp3Info.mData, MusicService.PLY_PLAY);
+    private void play(int position) {
+        MusicModel model = mMusicList.get(position);
+        setPlayBarInfo(model);
+        startIntent(position, MusicService.PLY_PLAY);
     }
 
     private void pause() {
-        startIntent(-1, "", MusicService.PLY_PAUSE);
-    }
-
-    private void resume() {
-        MusicModel mp3Info = mMusicList.get(mListPosition);
-        startIntent(mListPosition, mp3Info.mData, MusicService.PLY_CONTINUE);
-    }
-
-    private void next() {
-        mListPosition = mListPosition + 1;
-        if (mListPosition <= mMusicList.size() - 1) {
-            MusicModel mp3Info = mMusicList.get(mListPosition);
-            startIntent(mListPosition, mp3Info.mData, MusicService.PLY_NEXT);
-        } else {
-            Toast.makeText(this, "This is the last Song!", Toast.LENGTH_SHORT).show();
-        }
+        mMusicList.get(mLastPosition).isPlaying = false;
+        mMusicListAdapter.notifyDataSetChanged();
+        startIntent(mLastPosition, MusicService.PLY_PAUSE);
     }
 
     private void previous() {
-        mListPosition = mListPosition - 1;
-        if (mListPosition >= 0) {
-            MusicModel mp3Info = mMusicList.get(mListPosition);
-            startIntent(mListPosition, mp3Info.mData, MusicService.PLY_PRIVIOUS);
+        startIntent(mLastPosition, MusicService.PLY_PRIVIOUS);
+    }
+
+    private void next() {
+        startIntent(mLastPosition, MusicService.PLY_NEXT);
+    }
+
+    private void setPlayBarInfo(MusicModel model) {
+
+        if (model.mAlbum != null) {
+            Bitmap bitmap = BitmapFactory.decodeFile(model.mAlbum);
+            ivAlbum.setImageBitmap(bitmap);
+        }
+
+        tvMusicName.setText(model.mName);
+        tvAuthor.setText(model.mArtist);
+
+        if (model.isPlaying) {
+            ibPlay.setBackgroundResource(R.drawable.ic_activity_main_bar_pause_normal);
         } else {
-            Toast.makeText(this, "This is the first Song!", Toast.LENGTH_SHORT).show();
+            ibPlay.setBackgroundResource(R.drawable.ic_activity_main_bar_play_normal);
         }
     }
+
+    private void setBroadcast(int status) {
+        Intent intent = new Intent(MusicService.BROADCAST_ACTION_CHANGE_STATUS);
+        intent.putExtra(MusicService.STATUS, status);
+        sendBroadcast(intent);
+    }
+
+    private void startIntent(int position, int action) {
+        mServiceIntent = new Intent(this, MusicService.class);
+        mServiceIntent.setAction(MusicService.SERVICE_ACTION);
+        mServiceIntent.putExtra(MusicService.MUSIC_POSITION, position);
+        mServiceIntent.putExtra(MusicService.MUSIC_ACTION, action);
+        startService(mServiceIntent);
+    }
+
+    private void getCache() {
+        ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_MODEL);
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_POSITION) != null) {
+            mLastPosition = (int) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_POSITION);
+        }
+    }
+
+    private void resume() {
+        startIntent(-1, MusicService.PLY_CONTINUE);
+    }
+
 
     private void repeat_one() {
         setBroadcast(MusicService.STATUS_SINGLE);
@@ -274,27 +317,34 @@ public class MainActivity extends BaseActivity {
         setBroadcast(MusicService.STATUS_BY_RANDOM);
     }
 
-    private void setBroadcast(int status) {
-        Intent intent = new Intent(MusicService.ACTION_CTL_ACTION);
-        intent.putExtra(MusicService.STATUS, status);
-        sendBroadcast(intent);
+    private void stopService() {
+        stopService(mServiceIntent);
     }
 
-    private void startIntent(int position, String data, int action) {
-        Intent intent = new Intent(this, MusicService.class);
-        intent.setAction("android.media.browse.MediaBrowserService");
-        intent.putExtra(MusicService.PLY_POSITION, position);
-        intent.putExtra(MusicService.PLY_DATA, data);
-        intent.putExtra(MusicService.PLY_ACTION, action);
-        startService(intent);
+    private void setPlayingIcon(int oldPosition, int newPosition) {
+        mMusicList.get(oldPosition).isPlaying = false;
+        mMusicList.get(newPosition).isPlaying = true;
+        mMusicListAdapter.notifyDataSetChanged();
     }
 
-    //自定义的BroadcastReceiver，负责监听从Service传回来的广播
-    public class HomeReceiver extends BroadcastReceiver {
+    private class HomeReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
+
             String action = intent.getAction();
+
+            if (action.equals(MusicService.BROADCAST_ACTION_NEXT_SONGS)) {
+                MusicModel model = (MusicModel) intent.getExtras().getSerializable(MusicService.MUSIC_MODEL);
+                int position = intent.getExtras().getInt(MusicService.MUSIC_POSITION, mLastPosition);
+
+                model.isPlaying = true;
+                setPlayBarInfo(model);
+                setPlayingIcon(mLastPosition, position);
+                mLastPosition = position;
+            }
+
+
             if (action.equals(MusicService.ACTION_MUSIC_CURRENT)) {
 //                //currentTime代表当前播放的时间
 //                mCurrentTime = intent.getIntExtra(MusicService.PLY_CURRENT_TIME, -1);
@@ -339,5 +389,4 @@ public class MainActivity extends BaseActivity {
             }
         }
     }
-
 }
