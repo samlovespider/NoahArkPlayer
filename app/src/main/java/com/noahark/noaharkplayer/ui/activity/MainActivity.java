@@ -99,17 +99,7 @@ public class MainActivity extends BaseActivity {
     @ItemClick(R.id.lvMusics)
     @Override
     public void initItemClick(int position) {
-        if (mLastPosition == position) {
-            mLastPosition = -1;
-            mMusicList.get(position).isPlaying = false;
-        } else {
-            if (mLastPosition != -1) {
-                mMusicList.get(mLastPosition).isPlaying = false;
-            }
-            mLastPosition = position;
-            mMusicList.get(position).isPlaying = true;
-        }
-        mMusicListAdapter.notifyDataSetChanged();
+        controlListItemPlayIcon(position);
     }
 
     @Override
@@ -123,6 +113,20 @@ public class MainActivity extends BaseActivity {
                 finish();
             }
         }
+    }
+
+    private void controlListItemPlayIcon(int position) {
+        if (mLastPosition == position) {
+            mLastPosition = -1;
+            mMusicList.get(position).isPlaying = false;
+        } else {
+            if (mLastPosition != -1) {
+                mMusicList.get(mLastPosition).isPlaying = false;
+            }
+            mLastPosition = position;
+            mMusicList.get(position).isPlaying = true;
+        }
+        mMusicListAdapter.notifyDataSetChanged();
     }
 
     private void setReceiver() {
@@ -200,12 +204,6 @@ public class MainActivity extends BaseActivity {
         mCache.put(MUSICLIST, imageList);
     }
 
-    /**
-     * 格式化时间，将毫秒转换为分:秒格式
-     *
-     * @param time
-     * @return
-     */
     private String formatTime(long time) {
         String min = time / (1000 * 60) + "";
         String sec = time % (1000 * 60) + "";
