@@ -26,6 +26,8 @@ import com.noahark.noaharkplayer.adapter.MusicListAdapter;
 import com.noahark.noaharkplayer.base.ui.BaseActivity;
 import com.noahark.noaharkplayer.model.MusicModel;
 import com.noahark.noaharkplayer.service.MusicService;
+import com.noahark.noaharkplayer.util.LoadTaskListener;
+import com.noahark.noaharkplayer.util.MusicAlbumLoadTask;
 
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
@@ -37,10 +39,9 @@ import java.util.List;
 
 
 @EActivity(R.layout.activity_main)
-public class MainActivity extends BaseActivity {
+public class MainActivity extends BaseActivity implements LoadTaskListener {
 
     //
-    public static final String MUSIC_REPEAT_STATUS = "music_repeat_status";
     public static final String MUSICLIST = "musiclist";
     private static final int CODE_FOR_WRITE_PERMISSION = 1;
     //
@@ -78,11 +79,20 @@ public class MainActivity extends BaseActivity {
         setList();
         setReceiver();
 
-        mCache.put(MUSIC_REPEAT_STATUS, mRepeatState);
+        Object o = mCache.getAsObject(MusicService.MUSIC_REPEAT_STATUS);
+        if (o != null) {
+            mRepeatState = (int) o;
+        }
 
         getCache();
         if (mLastPosition != -1) {
             setPlayBarInfo(mMusicList.get(mLastPosition));
+        }
+
+        if (mMusicList != null) {
+            MusicAlbumLoadTask task = new MusicAlbumLoadTask(this, mMusicList);
+            task.setLoadTaskListener(this);
+            task.execute(mMusicList.toArray());
         }
     }
 
@@ -95,11 +105,11 @@ public class MainActivity extends BaseActivity {
                 break;
             case R.id.ibPlay:
                 if (mMusicList.get(mLastPosition).isPlaying) {
-                    mMusicList.get(mLastPosition).isPlaying = false;
+                    setPlayingIcon(mLastPosition, false);
                     view.setBackgroundResource(R.drawable.ic_activity_main_bar_play_normal);
                     pause();
                 } else {
-                    mMusicList.get(mLastPosition).isPlaying = true;
+                    setPlayingIcon(mLastPosition, true);
                     view.setBackgroundResource(R.drawable.ic_activity_main_bar_pause_normal);
                     play(mLastPosition);
                 }
@@ -115,17 +125,17 @@ public class MainActivity extends BaseActivity {
     public void initItemClick(int position) {
         if (mLastPosition == position) {
             mLastPosition = -1;
-            mMusicList.get(position).isPlaying = false;
+            setPlayingIcon(position, false);
+            setPlayBarInfo(mMusicList.get(position));
             pause();
         } else {
             if (mLastPosition != -1) {
                 mMusicList.get(mLastPosition).isPlaying = false;
             }
             mLastPosition = position;
-            mMusicList.get(position).isPlaying = true;
+            setPlayingIcon(position, true);
             play(mLastPosition);
         }
-        mMusicListAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -245,8 +255,6 @@ public class MainActivity extends BaseActivity {
     }
 
     private void pause() {
-        mMusicList.get(mLastPosition).isPlaying = false;
-        mMusicListAdapter.notifyDataSetChanged();
         startIntent(mLastPosition, MusicService.PLY_PAUSE);
     }
 
@@ -260,9 +268,11 @@ public class MainActivity extends BaseActivity {
 
     private void setPlayBarInfo(MusicModel model) {
 
-        if (model.mAlbum != null) {
-            Bitmap bitmap = BitmapFactory.decodeFile(model.mAlbum);
+        if (model.mAlbumID != null && createAlbumPic(model.mAlbumID) != null) {
+            Bitmap bitmap = createAlbumPic(model.mAlbumID);
             ivAlbum.setImageBitmap(bitmap);
+        } else {
+            ivAlbum.setImageResource(R.drawable.ic_empty_music_album);
         }
 
         tvMusicName.setText(model.mName);
@@ -300,7 +310,6 @@ public class MainActivity extends BaseActivity {
         startIntent(-1, MusicService.PLY_CONTINUE);
     }
 
-
     private void repeat_one() {
         setBroadcast(MusicService.STATUS_SINGLE);
     }
@@ -322,9 +331,58 @@ public class MainActivity extends BaseActivity {
     }
 
     private void setPlayingIcon(int oldPosition, int newPosition) {
-        mMusicList.get(oldPosition).isPlaying = false;
-        mMusicList.get(newPosition).isPlaying = true;
+        if (oldPosition != -1) {
+            mMusicList.get(oldPosition).isPlaying = false;
+        }
+        if (newPosition != -1) {
+            mMusicList.get(newPosition).isPlaying = true;
+        }
         mMusicListAdapter.notifyDataSetChanged();
+    }
+
+    private void setPlayingIcon(int position, boolean isPlaying) {
+        if (position != -1) {
+            mMusicList.get(position).isPlaying = isPlaying;
+            mMusicListAdapter.notifyDataSetChanged();
+        }
+    }
+
+    /**
+     * @param sAlbumID
+     * @return
+     */
+    private Bitmap createAlbumPic(String sAlbumID) {
+        if (!sAlbumID.isEmpty()) {
+            String albumFile = getAlbumArt(sAlbumID);
+            return BitmapFactory.decodeFile(albumFile);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * @param sAlbumID
+     * @return
+     */
+    private String getAlbumArt(String sAlbumID) {
+        String mUriAlbums = "content://media/external/audio/albums";
+        String[] projection = new String[]{"album_art"};
+        Cursor cur = getContentResolver().query(
+                Uri.parse(mUriAlbums + "/" + sAlbumID),
+                projection, null, null, null);
+        String album_art = null;
+        if (cur.getCount() > 0 && cur.getColumnCount() > 0) {
+            cur.moveToNext();
+            album_art = cur.getString(0);
+        }
+        cur.close();
+        cur = null;
+        return album_art;
+    }
+
+    @Override
+    public void loadTask(List<MusicModel> musicModels) {
+        mMusicListAdapter.refreshAlbum(mMusicList);
     }
 
     private class HomeReceiver extends BroadcastReceiver {

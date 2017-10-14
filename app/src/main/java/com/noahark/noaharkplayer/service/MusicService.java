@@ -30,6 +30,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final String MUSIC_ACTION = "action";
     public static final String MUSIC_POSITION = "position";
     public static final String MUSIC_MODEL = "model";
+    public static final String MUSIC_REPEAT_STATUS = "music_repeat_status";
     //
     public static final int PLY_PLAY = 1;
     public static final int PLY_PAUSE = 2;
@@ -186,6 +187,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     private void setCache() {
+        ACache.get(getBaseContext()).put(MUSIC_REPEAT_STATUS, mRepeatState);
         ACache.get(getBaseContext()).put(CACHE_MODEL, mList.get(mCurrPosition));
         ACache.get(getBaseContext()).put(CACHE_POSITION, mCurrPosition);
     }
@@ -196,8 +198,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     private void stop() {
-
-
         if (mPlayer != null) {
             mPlayer.stop();
             try {
@@ -229,6 +229,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mPlayer.release();
             mPlayer = null;
         }
+        //
+        setCache();
     }
 
     @Override

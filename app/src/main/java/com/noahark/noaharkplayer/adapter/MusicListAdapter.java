@@ -1,6 +1,7 @@
 package com.noahark.noaharkplayer.adapter;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,6 +25,15 @@ public class MusicListAdapter extends BaseAdapter {
     public MusicListAdapter(Context context, List<MusicModel> sMusicList) {
         mMusicList = sMusicList;
         mContext = context;
+    }
+
+    public void refreshAlbum(List<MusicModel> musicList) {
+        for (int i = 0; i < mMusicList.size(); i++) {
+            if (musicList.get(i).mBitmap != null) {
+                mMusicList.get(i).mBitmap = Bitmap.createBitmap(musicList.get(i).mBitmap);
+            }
+        }
+        notifyDataSetChanged();
     }
 
     @Override
