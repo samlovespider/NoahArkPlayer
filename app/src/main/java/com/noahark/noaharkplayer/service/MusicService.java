@@ -7,7 +7,9 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.support.annotation.Nullable;
 
 import com.alibaba.fastjson.JSONArray;
@@ -50,6 +52,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final String SERVICE_ACTION = "com.noahark.musicservice";
     public static final String BROADCAST_ACTION_CHANGE_STATUS = "com.noahark.action.change_status";
     public static final String BROADCAST_ACTION_NEXT_SONGS = "com.noahark.action.next_songs";
+    public static final String BROADCAST_ACTION_CURRENT_TIME = "com.noahark.action.current_time";
     //----------------------------------------------------------------
     public static final String MUSIC_DATA = "data";
     public static final String PLY_CURRENT_TIME = "currenttime";
@@ -66,19 +69,20 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     //
     private static final String TAG = "MusicService";
     //
-//    private Handler handler;// handler用来接收消息，来发送广播更新播放时间
 //    //
 //    private int mCurrentTime;
 //    private int mDuration;
 
 
     //--------------------
+    private Handler mHandler;// handler用来接收消息，来发送广播更新播放时间
     private MyReceiver mReceiver;
     private MediaPlayer mPlayer;
     private List<MusicModel> mList;
     private int mCurrPosition;
     private int mAction;
     private int mRepeatState = STATUS_BY_ORDER;
+    private int mCurrentTime;
 
 
     //--------------------
@@ -102,6 +106,25 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
         //
         setReceiver();
+
+
+        // send broadcast to MainActivity
+        mHandler = new Handler(new Handler.Callback() {
+            @Override
+            public boolean handleMessage(Message message) {
+                if (message.what == 1) {
+                    if (mPlayer != null) {
+                        mCurrentTime = mPlayer.getCurrentPosition(); // 获取当前音乐播放的位置
+                        Intent intent = new Intent();
+                        intent.setAction(BROADCAST_ACTION_CURRENT_TIME);
+                        intent.putExtra(PLY_CURRENT_TIME, mCurrentTime);
+                        sendBroadcast(intent); // 给MusicActivity发送广播
+                        mHandler.sendEmptyMessageDelayed(1, 1000);
+                    }
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -148,7 +171,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mPlayer.setOnPreparedListener(this);// 注册一个监听器
             //
             setCache();
-//            handler.sendEmptyMessage(1);
+            //
+            mHandler.sendEmptyMessage(1);
         } catch (Exception e) {
             e.printStackTrace();
         }

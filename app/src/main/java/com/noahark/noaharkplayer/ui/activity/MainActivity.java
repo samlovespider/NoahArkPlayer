@@ -10,6 +10,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
@@ -60,10 +61,10 @@ public class MainActivity extends BaseActivity implements LoadTaskListener {
     private MusicListAdapter mMusicListAdapter;
     private List<MusicModel> mMusicList;
     private HomeReceiver mHomeReceiver;  //自定义的广播接收器
+    private Intent mServiceIntent;
     private int mLastPosition = -1;
     private int mRepeatState = MusicService.STATUS_BY_ORDER;
 
-    private Intent mServiceIntent;
 
     @Override
     public void initView() {
@@ -115,7 +116,14 @@ public class MainActivity extends BaseActivity implements LoadTaskListener {
                 }
                 break;
             case R.id.relPlayBar:
-                gotoActivity(PlayingActivity_.class);
+                if (mLastPosition != -1) {
+                    MusicModel model = mMusicList.get(mLastPosition);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable(PlayingActivity_.MUSIC_MODEL_EXTRA, model);
+                    gotoActivity(PlayingActivity_.class, bundle);
+                } else {
+                    gotoActivity(PlayingActivity_.class);
+                }
                 break;
         }
     }

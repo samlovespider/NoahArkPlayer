@@ -1,73 +1,101 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_music_name"
-                android:layout_gravity="center"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="music name"
-                android:textSize="25sp"
-                android:paddingTop="3sp"/>
-
-            <TextView
-                android:id="@+id/tv_Artist"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="20sp"
-                android:text="Artist" />
-        </LinearLayout>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:app="http://schemas.android.com/apk/res-auto"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
 
     <LinearLayout
+        android:id="@+id/linTitle"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center|bottom"
-        android:orientation="horizontal"
-        android:paddingBottom="20dp">
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_music_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="music name"
+            android:textSize="25sp"/>
+
+        <TextView
+            android:id="@+id/tv_Artist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="5dp"
+            android:text="Artist"
+            android:textSize="20sp"/>
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/relPlayProgress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/linTitle"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp">
+
+        <com.shinelw.library.ColorArcProgressBar
+            android:id="@+id/pbPlayProgress"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:layout_centerInParent="true"
+            app:back_width="3dp"
+            app:front_color1="@color/red"
+            app:front_width="5dp"
+            app:total_engle="270"/>
+
+        <ImageButton
+            android:id="@+id/ibPlay"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_centerInParent="true"
+            android:background="@drawable/pic_music_play_pause"/>
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="40dp"
+        android:orientation="horizontal">
 
         <ImageButton
             android:id="@+id/ib_repeat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_music_repeat_normal" />
+            android:background="@drawable/ic_music_repeat_close"/>
 
         <View
             android:layout_width="1dp"
             android:layout_height="20dp"
+            android:layout_gravity="center"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginBottom="13dp"
-            android:background="@color/grey" />
+            android:background="@color/grey"/>
 
         <ImageButton
             android:id="@+id/ib_shuffle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_music_shuffle_normal" />
+            android:background="@drawable/ic_music_shuffle_normal"/>
 
         <View
             android:layout_width="1dp"
             android:layout_height="20dp"
+            android:layout_gravity="center"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginBottom="13dp"
-            android:background="@color/grey" />
+            android:background="@color/grey"/>
 
         <ImageButton
             android:id="@+id/ib_favorite"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/ic_music_favorite_normal" />
+            android:background="@drawable/ic_music_favorite_normal"/>
     </LinearLayout>
-</LinearLayout>
+</RelativeLayout>

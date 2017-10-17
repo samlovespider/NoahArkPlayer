@@ -14,9 +14,11 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
         tl:tl_bar_color="#ffffff"
+        tl:tl_indicator_anim_enable="true"
+        tl:tl_indicator_bounce_enable="false"
         tl:tl_indicator_color="@color/red"
         tl:tl_indicator_corner_radius="8dp"
-        tl:tl_tab_padding="5dp"/>
+        tl:tl_tab_width="80dp"/>
 
     <android.support.v4.view.ViewPager
         android:id="@+id/vpPlaying"
