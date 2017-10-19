@@ -57,7 +57,7 @@ public class MusicListAdapter extends BaseAdapter {
         ViewHolder holder;
 
         if (view == null) {
-            view = LayoutInflater.from(mContext).inflate(R.layout.activity_main_list_item, null);
+            view = LayoutInflater.from(mContext).inflate(R.layout.fragment_play_list_item, null);
             holder = new ViewHolder(view);
             view.setTag(holder);
         } else {

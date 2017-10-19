@@ -1,17 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tl="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.noahark.noaharkplayer.ui.activity.MainActivity">
 
-    <ListView
-        android:id="@+id/lvMusics"
+    <com.flyco.tablayout.SegmentTabLayout
+        android:id="@+id/stlLay"
+        android:layout_width="wrap_content"
+        android:layout_height="32dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        tl:tl_bar_color="#ffffff"
+        tl:tl_indicator_anim_enable="true"
+        tl:tl_indicator_bounce_enable="false"
+        tl:tl_indicator_color="@color/red"
+        tl:tl_indicator_corner_radius="8dp"
+        tl:tl_tab_width="80dp"/>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/vpPlaying"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/relPlayBar"/>
-
-    <include layout="@layout/activity_main_playbar"/>
-
+        android:layout_height="match_parent"
+        android:layout_below="@+id/stlLay"/>
 </RelativeLayout>

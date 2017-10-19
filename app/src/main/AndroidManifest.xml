@@ -20,10 +20,6 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.activity.PlayingActivity_"
-            android:screenOrientation="portrait">
-        </activity>
 
         <service
             android:name=".service.MusicService"

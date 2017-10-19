@@ -21,18 +21,19 @@ import com.noahark.noaharkplayer.model.MusicModel;
 import java.util.List;
 import java.util.Random;
 
-import static com.noahark.noaharkplayer.ui.activity.MainActivity.MUSICLIST;
+import static com.noahark.noaharkplayer.ui.fragment.PlayingListFragment.MUSICLIST;
 
 /**
  * @author caizhenliang
  */
-public class MusicService extends Service implements MediaPlayer.OnPreparedListener {
+public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
     //
     public static final String MUSIC_ACTION = "action";
     public static final String MUSIC_POSITION = "position";
     public static final String MUSIC_MODEL = "model";
     public static final String MUSIC_REPEAT_STATUS = "music_repeat_status";
+    public static final String MUSIC_ORDER_STATUS = "music_order_status";
     //
     public static final int PLY_PLAY = 1;
     public static final int PLY_PAUSE = 2;
@@ -40,19 +41,25 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final int PLY_PRIVIOUS = 4;
     public static final int PLY_NEXT = 5;
     //
-    public static final String STATUS = "status";
-    public static final int STATUS_SINGLE = 1;
-    public static final int STATUS_LOOP_ALL = 2;
-    public static final int STATUS_BY_ORDER = 3;
-    public static final int STATUS_BY_RANDOM = 4;
+    public static final String REPEAT = "repeat";
+    public static final int REPEAT_NORAML = 0;
+    public static final int REPEAT_SINGLE = 1;
+    public static final int REPEAT_LOOP_ALL = 2;
+    //
+    public static final String ORDER = "order";
+    public static final int ORDER_BY_ORDER = 3;
+    public static final int ORDER_BY_RANDOM = 4;
     //
     public static final String CACHE_MODEL = "cache_model";
     public static final String CACHE_POSITION = "cache_position";
+    public static final String CACHE_REPEAT = "cache_repeat";
+    public static final String CACHE_ORDER = "cache_order";
     //
     public static final String SERVICE_ACTION = "com.noahark.musicservice";
     public static final String BROADCAST_ACTION_CHANGE_STATUS = "com.noahark.action.change_status";
     public static final String BROADCAST_ACTION_NEXT_SONGS = "com.noahark.action.next_songs";
     public static final String BROADCAST_ACTION_CURRENT_TIME = "com.noahark.action.current_time";
+    public static final String BROADCAST_ACTION_NOW_PLAYING = "com.noahark.action.now_playing";
     //----------------------------------------------------------------
     public static final String MUSIC_DATA = "data";
     public static final String PLY_CURRENT_TIME = "currenttime";
@@ -73,7 +80,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 //    private int mCurrentTime;
 //    private int mDuration;
 
-
     //--------------------
     private Handler mHandler;// handler用来接收消息，来发送广播更新播放时间
     private MyReceiver mReceiver;
@@ -81,7 +87,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private List<MusicModel> mList;
     private int mCurrPosition;
     private int mAction;
-    private int mRepeatState = STATUS_BY_ORDER;
+    private int mRepeatState = REPEAT_NORAML;
+    private int mOrderState = ORDER_BY_ORDER;
     private int mCurrentTime;
 
 
@@ -106,9 +113,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
         //
         setReceiver();
-
-
-        // send broadcast to MainActivity
+        // send broadcast to PlayingListFragment
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message message) {
@@ -125,6 +130,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 return true;
             }
         });
+        //
+        mPlayer.setOnCompletionListener(this);
     }
 
     @Override
@@ -194,7 +201,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mCurrPosition--;
         if (mCurrPosition >= 0) {
             play(mCurrPosition);
-            sendBroadcastToHome(mList.get(mCurrPosition));
+            sendBroadcastToList(mList.get(mCurrPosition));
         } else {
             stop();
         }
@@ -204,14 +211,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mCurrPosition++;
         if (mCurrPosition <= mList.size() - 1) {
             play(mCurrPosition);
-            sendBroadcastToHome(mList.get(mCurrPosition));
+            sendBroadcastToList(mList.get(mCurrPosition));
         } else {
             stop();
         }
     }
 
     private void setCache() {
-        ACache.get(getBaseContext()).put(MUSIC_REPEAT_STATUS, mRepeatState);
+        ACache.get(getBaseContext()).put(CACHE_ORDER, mOrderState);
+        ACache.get(getBaseContext()).put(CACHE_REPEAT, mRepeatState);
         ACache.get(getBaseContext()).put(CACHE_MODEL, mList.get(mCurrPosition));
         ACache.get(getBaseContext()).put(CACHE_POSITION, mCurrPosition);
     }
@@ -237,7 +245,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return random.nextInt(size);
     }
 
-    private void sendBroadcastToHome(MusicModel model) {
+    private void sendBroadcastToPlaying(MusicModel model) {
+        Intent intent = new Intent(MusicService.BROADCAST_ACTION_NOW_PLAYING);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(MusicService.MUSIC_MODEL, model);
+        bundle.putInt(MusicService.MUSIC_POSITION, mCurrPosition);
+        intent.putExtras(bundle);
+        sendBroadcast(intent);
+    }
+
+    private void sendBroadcastToList(MusicModel model) {
         Intent intent = new Intent(MusicService.BROADCAST_ACTION_NEXT_SONGS);
         Bundle bundle = new Bundle();
         bundle.putSerializable(MusicService.MUSIC_MODEL, model);
@@ -262,11 +279,17 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mediaPlayer.start();
     }
 
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+
+    }
+
     public class MyReceiver extends BroadcastReceiver {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            mRepeatState = intent.getIntExtra(STATUS, STATUS_BY_ORDER);
+            mRepeatState = intent.getIntExtra(REPEAT, REPEAT_NORAML);
+            mOrderState = intent.getIntExtra(ORDER, ORDER_BY_ORDER);
         }
     }
 }

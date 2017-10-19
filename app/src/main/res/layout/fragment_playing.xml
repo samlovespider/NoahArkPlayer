@@ -17,7 +17,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="music name"
             android:textSize="25sp"/>
 
         <TextView
@@ -26,7 +25,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
-            android:text="Artist"
             android:textSize="20sp"/>
     </LinearLayout>
 

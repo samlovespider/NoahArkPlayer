@@ -20,6 +20,7 @@ public class MusicModel implements Serializable {
     public String mSize;
     public Bitmap mBitmap;
     public boolean isPlaying;
+    public boolean isFavorite;
 
     public MusicModel() {
     }

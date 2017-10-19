@@ -16,6 +16,7 @@ import org.androidannotations.annotations.EFragment;
 @EFragment
 abstract public class BaseFragment extends MyBaseFragment {
 
+
     @AfterViews
     @Override
     abstract public void initView();
