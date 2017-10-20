@@ -12,7 +12,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.view.View;
 import android.widget.ImageButton;
@@ -21,12 +20,13 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.alibaba.fastjson.JSONArray;
-import com.caizhenliang.mylibrary.util.base.ACache;
 import com.noahark.noaharkplayer.R;
 import com.noahark.noaharkplayer.adapter.MusicListAdapter;
 import com.noahark.noaharkplayer.base.ui.BaseFragment;
+import com.noahark.noaharkplayer.base.util.ACache;
 import com.noahark.noaharkplayer.model.MusicModel;
 import com.noahark.noaharkplayer.service.MusicService;
+import com.noahark.noaharkplayer.ui.activity.MainActivity;
 import com.noahark.noaharkplayer.util.LoadTaskListener;
 import com.noahark.noaharkplayer.util.MusicAlbumLoadTask;
 
@@ -43,7 +43,6 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
 
     //
     public static final String MUSICLIST = "musiclist";
-    private static final int CODE_FOR_WRITE_PERMISSION = 1;
     //
     @ViewById(R.id.lvMusics)
     ListView lvMusics;
@@ -69,7 +68,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
         // request permissions
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this.getActivity(), new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    CODE_FOR_WRITE_PERMISSION);
+                    MainActivity.CODE_FOR_WRITE_PERMISSION);
             return;
         }
         // get music list
@@ -90,8 +89,10 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
         //
         startServiceNow();
         //
-        setPlayingIcon(mLastPosition, mMusicModel.isPlaying);
-        setPlayBarInfo(mMusicModel);
+        if (mMusicModel != null) {
+            setPlayingIcon(mLastPosition, mMusicModel.isPlaying);
+            setPlayBarInfo(mMusicModel);
+        }
     }
 
     private void setList() {
@@ -117,10 +118,10 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
     }
 
     private void getCache() {
-        if (ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_MODEL) != null) {
+        if (mCache.getAsObject(MusicService.CACHE_MODEL) != null) {
             mMusicModel = (MusicModel) ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_MODEL);
         }
-        if (ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_POSITION) != null) {
+        if (mCache.getAsObject(MusicService.CACHE_POSITION) != null) {
             mLastPosition = (int) ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_POSITION);
         }
     }
@@ -173,19 +174,6 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
             mLastPosition = position;
             setPlayingIcon(position, true);
             play(mLastPosition);
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == CODE_FOR_WRITE_PERMISSION) {
-            if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                //
-                initView();
-            } else {
-                getActivity().finish();
-            }
         }
     }
 

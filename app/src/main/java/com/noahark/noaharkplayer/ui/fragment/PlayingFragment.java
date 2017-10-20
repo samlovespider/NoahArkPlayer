@@ -10,7 +10,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-import com.caizhenliang.mylibrary.util.base.ACache;
 import com.noahark.noaharkplayer.R;
 import com.noahark.noaharkplayer.base.ui.BaseFragment;
 import com.noahark.noaharkplayer.model.MusicModel;
@@ -62,17 +61,17 @@ public class PlayingFragment extends BaseFragment {
     }
 
     private void getCache() {
-        if (ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_MODEL) != null) {
-            mMusicModel = (MusicModel) ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_MODEL);
+        if (mCache.getAsObject(MusicService.CACHE_MODEL) != null) {
+            mMusicModel = (MusicModel) mCache.getAsObject(MusicService.CACHE_MODEL);
         }
-        if (ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_POSITION) != null) {
-            mLastPosition = (int) ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_POSITION);
+        if (mCache.getAsObject(MusicService.CACHE_POSITION) != null) {
+            mLastPosition = (int) mCache.getAsObject(MusicService.CACHE_POSITION);
         }
-        if (ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_ORDER) != null) {
-            mOrderState = (int) ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_ORDER);
+        if (mCache.getAsObject(MusicService.CACHE_ORDER) != null) {
+            mOrderState = (int) mCache.getAsObject(MusicService.CACHE_ORDER);
         }
-        if (ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_REPEAT) != null) {
-            mRepeatState = (int) ACache.get(getActivity().getBaseContext()).getAsObject(MusicService.CACHE_REPEAT);
+        if (mCache.getAsObject(MusicService.CACHE_REPEAT) != null) {
+            mRepeatState = (int) mCache.getAsObject(MusicService.CACHE_REPEAT);
         }
     }
 

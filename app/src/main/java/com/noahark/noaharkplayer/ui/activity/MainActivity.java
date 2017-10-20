@@ -1,5 +1,8 @@
 package com.noahark.noaharkplayer.ui.activity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 @EActivity(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
 
+    public static final int CODE_FOR_WRITE_PERMISSION = 1;
     //
     @ViewById(R.id.stlLay)
     SegmentTabLayout stlLay;
@@ -33,15 +37,16 @@ public class MainActivity extends BaseActivity {
     ViewPager vpPlaying;
     //
     private ArrayList<Fragment> mFragments = new ArrayList<>();
+    private PlayingListFragment mPlayingListFragment;
 
     @Override
     public void initView() {
 
         //
         PlayingFragment playingFragment = new PlayingFragment_();
-        PlayingListFragment playingListFragment = new PlayingListFragment_();
+        mPlayingListFragment = new PlayingListFragment_();
         mFragments.add(playingFragment);
-        mFragments.add(playingListFragment);
+        mFragments.add(mPlayingListFragment);
 
         MyPagerAdapter mMyPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), mFragments);
         vpPlaying.setAdapter(mMyPagerAdapter);
@@ -75,6 +80,19 @@ public class MainActivity extends BaseActivity {
             }
         });
         vpPlaying.setCurrentItem(0);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CODE_FOR_WRITE_PERMISSION) {
+            if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //
+                mPlayingListFragment.initView();
+            } else {
+                finish();
+            }
+        }
     }
 
     private class MyPagerAdapter extends FragmentPagerAdapter {

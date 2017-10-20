@@ -13,9 +13,9 @@ import android.os.Message;
 import android.support.annotation.Nullable;
 
 import com.alibaba.fastjson.JSONArray;
-import com.caizhenliang.mylibrary.util.SCLogHelper;
-import com.caizhenliang.mylibrary.util.base.ACache;
 import com.noahark.noaharkplayer.BuildConfig;
+import com.noahark.noaharkplayer.base.util.ACache;
+import com.noahark.noaharkplayer.base.util.SCLogHelper;
 import com.noahark.noaharkplayer.model.MusicModel;
 
 import java.util.ArrayList;
