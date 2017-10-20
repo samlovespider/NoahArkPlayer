@@ -77,6 +77,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private int mRepeatState = REPEAT_NORAML;
     private int mOrderState = ORDER_BY_ORDER;
     private int mCurrentTime;
+    private int mAction;
     private int mCount;// count how much songs already played
 
     @Nullable
@@ -124,7 +125,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
 
         mCurrPosition = intent.getIntExtra(MUSIC_POSITION, -1);
-        int mAction = intent.getIntExtra(MUSIC_ACTION, -1);
+        mAction = intent.getIntExtra(MUSIC_ACTION, -1);
 
         switch (mAction) {
             case PLY_PLAY:
@@ -138,7 +139,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 break;
             case PLY_PRIVIOUS:
                 int position = mCurrPosition;
-                mPrePositions.remove(mPrePositions.size() - 1);
+                if (mPrePositions.size() > 0) {
+                    mPrePositions.remove(mPrePositions.size() - 1);
+                }
                 if (mPrePositions.size() > 0) {
                     position = mPrePositions.get(mPrePositions.size() - 1);
                     mCurrPosition = position;
@@ -178,7 +181,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             sendBroadcastToPlaying(mMusicModel);
             sendBroadcastToList(mMusicModel);
             //
-            mPrePositions.add(mCurrPosition);
+            if (mCurrPosition != -1 && mAction != PLY_PRIVIOUS) {
+                mPrePositions.add(mCurrPosition);
+                if (BuildConfig.DEBUG) {
+                    SCLogHelper.w(TAG, "play mPrePositions", mPrePositions);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
