@@ -24,7 +24,11 @@ import org.androidannotations.annotations.WindowFeature;
 
 import java.util.ArrayList;
 
-
+/**
+ * Peter Chiu,
+ * Yuanda Huo,
+ * Zhenliang Cai, 17108093
+ */
 @WindowFeature(Window.FEATURE_NO_TITLE)
 @EActivity(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
