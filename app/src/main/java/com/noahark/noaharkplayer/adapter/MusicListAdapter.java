@@ -27,6 +27,11 @@ public class MusicListAdapter extends BaseAdapter {
         mContext = context;
     }
 
+    public void setPlayingIcon(int position, boolean isPlaying) {
+        mMusicList.get(position).isPlaying = isPlaying;
+        notifyDataSetChanged();
+    }
+
     public void refreshAlbum(List<MusicModel> musicList) {
         for (int i = 0; i < mMusicList.size(); i++) {
             if (musicList.get(i).mBitmap != null) {

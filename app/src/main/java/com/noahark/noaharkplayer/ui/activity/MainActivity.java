@@ -39,7 +39,6 @@ public class MainActivity extends BaseActivity {
 
         //
         PlayingFragment playingFragment = new PlayingFragment_();
-//        PlayingFragment playingFragment = PlayingFragment_.builder().mMusicModel(model).build();
         PlayingListFragment playingListFragment = new PlayingListFragment_();
         mFragments.add(playingFragment);
         mFragments.add(playingListFragment);
@@ -81,7 +80,7 @@ public class MainActivity extends BaseActivity {
     private class MyPagerAdapter extends FragmentPagerAdapter {
         private ArrayList<Fragment> mFragments;
 
-        public MyPagerAdapter(FragmentManager fm, ArrayList<Fragment> sFragments) {
+        private MyPagerAdapter(FragmentManager fm, ArrayList<Fragment> sFragments) {
             super(fm);
             mFragments = sFragments;
         }

@@ -54,6 +54,22 @@
             android:background="@drawable/pic_music_play_pause"/>
     </RelativeLayout>
 
+    <TextView
+        android:id="@+id/tvCurTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/relPlayProgress"
+        android:layout_below="@+id/relPlayProgress"
+        android:text="00:00"/>
+
+    <TextView
+        android:id="@+id/tvTotalTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/relPlayProgress"
+        android:layout_below="@+id/relPlayProgress"
+        android:text="00:00"/>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

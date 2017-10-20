@@ -39,11 +39,14 @@ public class PlayingFragment extends BaseFragment {
     ImageButton ib_shuffle;
     @ViewById(R.id.ib_favorite)
     ImageButton ib_favorite;
+    @ViewById(R.id.tvCurTime)
+    TextView tvCurTime;
+    @ViewById(R.id.tvTotalTime)
+    TextView tvTotalTime;
     //
     private PlayingReceiver mPlayingReceiver;  //自定义的广播接收器
     private MusicModel mMusicModel;
     //
-    private boolean isFavorite = false;
     private int mRepeatState = MusicService.REPEAT_NORAML;
     private int mOrderState = MusicService.ORDER_BY_ORDER;
     private int mLastPosition = -1;
@@ -56,16 +59,6 @@ public class PlayingFragment extends BaseFragment {
         setMusicInfo(mMusicModel);
         //
         setReceiver();
-    }
-
-    private void setReceiver() {
-        mPlayingReceiver = new PlayingReceiver();
-        // 创建IntentFilter
-        IntentFilter filter = new IntentFilter();
-        // 指定BroadcastReceiver监听的Action
-        filter.addAction(MusicService.BROADCAST_ACTION_NEXT_SONGS);
-        // 注册BroadcastReceiver
-        mContext.registerReceiver(mPlayingReceiver, filter);
     }
 
     private void getCache() {
@@ -121,11 +114,33 @@ public class PlayingFragment extends BaseFragment {
         } else {
             ib_favorite.setBackgroundResource(R.drawable.ic_music_favorite_normal);
         }
+
+        pbPlayProgress.setMaxValues(Integer.parseInt(musicModel.mDuration));
+        pbPlayProgress.setCurrentValues(0);
+
+        tvCurTime.setText("00:00");
+        tvTotalTime.setText(formatTime(Integer.parseInt(musicModel.mDuration)));
+    }
+
+    private void setReceiver() {
+        mPlayingReceiver = new PlayingReceiver();
+        // 创建IntentFilter
+        IntentFilter filter = new IntentFilter();
+        // 指定BroadcastReceiver监听的Action
+        filter.addAction(MusicService.BROADCAST_ACTION_NOW_PLAYING);
+        filter.addAction(MusicService.BROADCAST_ACTION_CURRENT_TIME);
+        // 注册BroadcastReceiver
+        mContext.registerReceiver(mPlayingReceiver, filter);
     }
 
     @Click({R.id.ibPlay, R.id.ib_favorite, R.id.ib_repeat, R.id.ib_shuffle})
     @Override
     public void initClick(View view) {
+
+        if (mMusicModel == null) {
+            return;
+        }
+
         switch (view.getId()) {
             case R.id.ibPlay:
                 if (mMusicModel.isPlaying) {
@@ -156,13 +171,14 @@ public class PlayingFragment extends BaseFragment {
                 sendBroadcastToService();
                 break;
             case R.id.ib_favorite:
-                if (isFavorite) {
+                if (mMusicModel.isFavorite) {
+                    mMusicModel.isFavorite = false;
                     view.setBackgroundResource(R.drawable.ic_music_favorite_normal);
-                    isFavorite = false;
                 } else {
+                    mMusicModel.isFavorite = true;
                     view.setBackgroundResource(R.drawable.ic_music_favorite_pressed);
-                    isFavorite = true;
                 }
+                sendBroadcastToService();
                 break;
             case R.id.ib_shuffle:
                 if (mOrderState == MusicService.ORDER_BY_RANDOM) {
@@ -190,6 +206,7 @@ public class PlayingFragment extends BaseFragment {
         Bundle bundle = new Bundle();
         bundle.putInt(MusicService.REPEAT, mRepeatState);
         bundle.putInt(MusicService.ORDER, mOrderState);
+        bundle.putBoolean(MusicService.MUSIC_FAVORITE, mMusicModel.isFavorite);
         intent.putExtras(bundle);
         mContext.sendBroadcast(intent);
     }
@@ -202,6 +219,32 @@ public class PlayingFragment extends BaseFragment {
         mContext.startService(intent);
     }
 
+    private String formatTime(long time) {
+        String min = time / (1000 * 60) + "";
+        String sec = time % (1000 * 60) + "";
+        if (min.length() < 2) {
+            min = "0" + time / (1000 * 60) + "";
+        } else {
+            min = time / (1000 * 60) + "";
+        }
+        if (sec.length() == 4) {
+            sec = "0" + (time % (1000 * 60)) + "";
+        } else if (sec.length() == 3) {
+            sec = "00" + (time % (1000 * 60)) + "";
+        } else if (sec.length() == 2) {
+            sec = "000" + (time % (1000 * 60)) + "";
+        } else if (sec.length() == 1) {
+            sec = "0000" + (time % (1000 * 60)) + "";
+        }
+        return min + ":" + sec.trim().substring(0, 2);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mContext.unregisterReceiver(mPlayingReceiver);
+    }
+
     private class PlayingReceiver extends BroadcastReceiver {
 
         @Override
@@ -209,58 +252,19 @@ public class PlayingFragment extends BaseFragment {
 
             String action = intent.getAction();
 
-            if (action.equals(MusicService.BROADCAST_ACTION_NEXT_SONGS)) {
+            if (action.equals(MusicService.BROADCAST_ACTION_NOW_PLAYING)) {
                 mMusicModel = (MusicModel) intent.getExtras().getSerializable(MusicService.MUSIC_MODEL);
                 mLastPosition = intent.getExtras().getInt(MusicService.MUSIC_POSITION, -1);
+                //
+                pbPlayProgress.setMaxValues(Integer.parseInt(mMusicModel.mDuration));
+                //
+                setMusicInfo(mMusicModel);
 
             } else if (action.equals(MusicService.BROADCAST_ACTION_CURRENT_TIME)) {
-                // TODO: 2017/10/19
                 int curTime = intent.getIntExtra(MusicService.PLY_CURRENT_TIME, -1);
-
-            }
-
-
-            if (action.equals(MusicService.ACTION_MUSIC_CURRENT)) {
-//                //currentTime代表当前播放的时间
-//                mCurrentTime = intent.getIntExtra(MusicService.PLY_CURRENT_TIME, -1);
-//                tvCurrentTime.setText(mCurrentTime);
-//
-            } else if (action.equals(MusicService.ACTION_MUSIC_DURATION)) {
-//                mDuration = intent.getIntExtra(MusicService.PLY_DURATION, -1);
-//
-            } else if (action.equals(MusicService.ACTION_UPDATE_ACTION)) {
-//                //获取Intent中的current消息，current代表当前正在播放的歌曲
-//                mListPosition = intent.getIntExtra(MusicService.PLY_POSITION, -1);
-//                if (mListPosition >= 0) {
-//                    musicTitle.setText(mp3Infos.get(mListPosition).getTitle());
-//                }
-            } else if (action.equals(MusicService.ACTION_REPEAT_ACTION)) {
-//                mRepeatState = intent.getIntExtra(MusicService.STATUS, -1);
-//                switch (mRepeatState) {
-//                    case MusicService.STATUS_SINGLE: // 单曲循环
-//                        repeatBtn.setBackgroundResource(R.drawable.repeat_current_selector);
-//                        shuffleBtn.setClickable(false);
-//                        break;
-//                    case MusicService.STATUS_LOOP_ALL: // 全部循环
-//                        repeatBtn.setBackgroundResource(R.drawable.repeat_all_selector);
-//                        shuffleBtn.setClickable(false);
-//                        break;
-//                    case MusicService.STATUS_BY_ORDER: // 无重复
-//                        repeatBtn.setBackgroundResource(R.drawable.repeat_none_selector);
-//                        shuffleBtn.setClickable(true);
-//                        break;
-//                }
-            } else if (action.equals(MusicService.ACTION_SHUFFLE_ACTION)) {
-//                isShuffle = intent.getBooleanExtra("shuffleState", false);
-//                if (isShuffle) {
-//                    isNoneShuffle = false;
-//                    shuffleBtn.setBackgroundResource(R.drawable.shuffle_selector);
-//                    repeatBtn.setClickable(false);
-//                } else {
-//                    isNoneShuffle = true;
-//                    shuffleBtn.setBackgroundResource(R.drawable.shuffle_none_selector);
-//                    repeatBtn.setClickable(true);
-//                }
+                pbPlayProgress.setCurrentValues(curTime);
+                //
+                tvCurTime.setText(formatTime(curTime));
             }
         }
     }

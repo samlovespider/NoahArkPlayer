@@ -18,6 +18,7 @@ import com.caizhenliang.mylibrary.util.base.ACache;
 import com.noahark.noaharkplayer.BuildConfig;
 import com.noahark.noaharkplayer.model.MusicModel;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -32,8 +33,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final String MUSIC_ACTION = "action";
     public static final String MUSIC_POSITION = "position";
     public static final String MUSIC_MODEL = "model";
-    public static final String MUSIC_REPEAT_STATUS = "music_repeat_status";
-    public static final String MUSIC_ORDER_STATUS = "music_order_status";
+    public static final String MUSIC_FAVORITE = "favorite";
     //
     public static final int PLY_PLAY = 1;
     public static final int PLY_PAUSE = 2;
@@ -54,6 +54,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final String CACHE_POSITION = "cache_position";
     public static final String CACHE_REPEAT = "cache_repeat";
     public static final String CACHE_ORDER = "cache_order";
+    public static final String CACHE_COUNT = "cache_count";
     //
     public static final String SERVICE_ACTION = "com.noahark.musicservice";
     public static final String BROADCAST_ACTION_CHANGE_STATUS = "com.noahark.action.change_status";
@@ -61,38 +62,22 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final String BROADCAST_ACTION_CURRENT_TIME = "com.noahark.action.current_time";
     public static final String BROADCAST_ACTION_NOW_PLAYING = "com.noahark.action.now_playing";
     //----------------------------------------------------------------
-    public static final String MUSIC_DATA = "data";
     public static final String PLY_CURRENT_TIME = "currenttime";
-    public static final int PLY_STOP = 3;
-    public static final int PLY_PROGRESS = 7;
-    public static final int PLY_PLAYING = 8;
-    //BroadcastReceiver
-    public static final String ACTION_UPDATE_ACTION = "com.noahark.action.UPDATE_ACTION";  //更新动作
-    public static final String ACTION_CTL_ACTION = "com.noahark.action.CTL_ACTION";        //控制动作
-    public static final String ACTION_MUSIC_CURRENT = "com.noahark.action.MUSIC_CURRENT";  //当前音乐播放时间更新动作
-    public static final String ACTION_MUSIC_DURATION = "com.noahark.action.MUSIC_DURATION";//新音乐长度更新动作
-    public static final String ACTION_REPEAT_ACTION = "com.noahark.action.REPEAT_ACTION";
-    public static final String ACTION_SHUFFLE_ACTION = "com.noahark.action.SHUFFLE_ACTION";
     //
     private static final String TAG = "MusicService";
-    //
-//    //
-//    private int mCurrentTime;
-//    private int mDuration;
 
     //--------------------
     private Handler mHandler;// handler用来接收消息，来发送广播更新播放时间
     private MyReceiver mReceiver;
     private MediaPlayer mPlayer;
     private List<MusicModel> mList;
+    private List<Integer> mPrePositions;
+    private MusicModel mMusicModel;
     private int mCurrPosition;
-    private int mAction;
     private int mRepeatState = REPEAT_NORAML;
     private int mOrderState = ORDER_BY_ORDER;
     private int mCurrentTime;
-
-
-    //--------------------
+    private int mCount;// count how much songs already played
 
     @Nullable
     @Override
@@ -105,12 +90,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         super.onCreate();
         //
         mPlayer = new MediaPlayer();
+        mPrePositions = new ArrayList<>();
         //
-        String lists = ACache.get(getBaseContext()).getAsString(MUSICLIST);
-        mList = JSONArray.parseArray(lists, MusicModel.class);
-        if (BuildConfig.DEBUG) {
-            SCLogHelper.w(TAG, "onCreate MusicList", mList);
-        }
+        getCache();
         //
         setReceiver();
         // send broadcast to PlayingListFragment
@@ -137,8 +119,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        if (intent == null) {
+            return START_STICKY;
+        }
+
         mCurrPosition = intent.getIntExtra(MUSIC_POSITION, -1);
-        mAction = intent.getIntExtra(MUSIC_ACTION, -1);
+        int mAction = intent.getIntExtra(MUSIC_ACTION, -1);
 
         switch (mAction) {
             case PLY_PLAY:
@@ -151,10 +137,17 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 resume();
                 break;
             case PLY_PRIVIOUS:
-                previous();
+                int position = mCurrPosition;
+                mPrePositions.remove(mPrePositions.size() - 1);
+                if (mPrePositions.size() > 0) {
+                    position = mPrePositions.get(mPrePositions.size() - 1);
+                    mCurrPosition = position;
+                }
+                previous(position);
                 break;
             case PLY_NEXT:
-                next();
+                getNextPosition(mCurrPosition);
+                next(mCurrPosition);
                 break;
         }
         return START_STICKY;
@@ -171,8 +164,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         try {
             mPlayer.reset();
             //
-            String data = mList.get(position).mData;
-            mPlayer.setDataSource(data);
+            mMusicModel = mList.get(position);
+            mPlayer.setDataSource(mMusicModel.mData);
+            //
+            mMusicModel.isPlaying = true;
             //
             mPlayer.prepare();
             mPlayer.setOnPreparedListener(this);// 注册一个监听器
@@ -180,6 +175,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             setCache();
             //
             mHandler.sendEmptyMessage(1);
+            sendBroadcastToPlaying(mMusicModel);
+            sendBroadcastToList(mMusicModel);
+            //
+            mPrePositions.add(mCurrPosition);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -188,6 +187,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private void pause() {
         if (mPlayer != null && mPlayer.isPlaying()) {
             mPlayer.pause();
+            mMusicModel.isPlaying = false;
+            sendBroadcastToPlaying(mMusicModel);
+            sendBroadcastToList(mMusicModel);
+            mHandler.removeMessages(1);
+            //
+            setCache();
         }
     }
 
@@ -197,21 +202,21 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
-    private void previous() {
-        mCurrPosition--;
-        if (mCurrPosition >= 0) {
-            play(mCurrPosition);
-            sendBroadcastToList(mList.get(mCurrPosition));
+    private void previous(int position) {
+        if (position >= 0) {
+            play(position);
+            mMusicModel = mList.get(position);
+            sendBroadcastToList(mMusicModel);
         } else {
             stop();
         }
     }
 
-    private void next() {
-        mCurrPosition++;
-        if (mCurrPosition <= mList.size() - 1) {
-            play(mCurrPosition);
-            sendBroadcastToList(mList.get(mCurrPosition));
+    private void next(int position) {
+        if (position <= mList.size() - 1) {
+            play(position);
+            mMusicModel = mList.get(position);
+            sendBroadcastToList(mMusicModel);
         } else {
             stop();
         }
@@ -220,18 +225,44 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private void setCache() {
         ACache.get(getBaseContext()).put(CACHE_ORDER, mOrderState);
         ACache.get(getBaseContext()).put(CACHE_REPEAT, mRepeatState);
-        ACache.get(getBaseContext()).put(CACHE_MODEL, mList.get(mCurrPosition));
+        ACache.get(getBaseContext()).put(CACHE_MODEL, mMusicModel);
         ACache.get(getBaseContext()).put(CACHE_POSITION, mCurrPosition);
+        ACache.get(getBaseContext()).put(CACHE_COUNT, mCount);
     }
 
     private void getCache() {
-        ACache.get(getBaseContext()).getAsObject(CACHE_MODEL);
-        mCurrPosition = (int) ACache.get(getBaseContext()).getAsObject(CACHE_POSITION);
+        if (ACache.get(getBaseContext()).getAsString(MUSICLIST) != null) {
+            String lists = ACache.get(getBaseContext()).getAsString(MUSICLIST);
+            mList = JSONArray.parseArray(lists, MusicModel.class);
+            if (BuildConfig.DEBUG) {
+                SCLogHelper.w(TAG, "onCreate MusicList", mList);
+            }
+        }
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_MODEL) != null) {
+            mMusicModel = (MusicModel) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_MODEL);
+        }
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_POSITION) != null) {
+            mCurrPosition = (int) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_POSITION);
+            mPrePositions.add(mCurrPosition);
+        }
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_ORDER) != null) {
+            mOrderState = (int) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_ORDER);
+        }
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_REPEAT) != null) {
+            mRepeatState = (int) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_REPEAT);
+        }
     }
 
     private void stop() {
         if (mPlayer != null) {
             mPlayer.stop();
+            mPrePositions.clear();
+            mMusicModel.isPlaying = false;
+            sendBroadcastToPlaying(mMusicModel);
+            sendBroadcastToList(mMusicModel);
+            mHandler.removeMessages(1);
+            //
+            setCache();
             try {
                 mPlayer.prepare();
             } catch (Exception e) {
@@ -246,10 +277,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     private void sendBroadcastToPlaying(MusicModel model) {
-        Intent intent = new Intent(MusicService.BROADCAST_ACTION_NOW_PLAYING);
+        Intent intent = new Intent(BROADCAST_ACTION_NOW_PLAYING);
         Bundle bundle = new Bundle();
-        bundle.putSerializable(MusicService.MUSIC_MODEL, model);
-        bundle.putInt(MusicService.MUSIC_POSITION, mCurrPosition);
+        bundle.putSerializable(MUSIC_MODEL, model);
+        bundle.putInt(MUSIC_POSITION, mCurrPosition);
         intent.putExtras(bundle);
         sendBroadcast(intent);
     }
@@ -271,7 +302,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mPlayer = null;
         }
         //
+        mHandler.removeMessages(1);
         setCache();
+        unregisterReceiver(mReceiver);
     }
 
     @Override
@@ -281,7 +314,49 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
+        mCount++;
+        if (mCount == mList.size()) {
+            if (mRepeatState == REPEAT_LOOP_ALL) {
+                mCurrPosition = 0;
+                mCount = 0;
+                getNextPosition(mCurrPosition);
+                play(mCurrPosition);
 
+            } else if (mRepeatState == REPEAT_SINGLE) {
+                mCount--;
+                play(mCurrPosition);
+
+            } else if (mRepeatState == REPEAT_NORAML) {
+                mCount = 0;
+                stop();
+            }
+        } else {
+            if (mRepeatState == REPEAT_LOOP_ALL) {
+                mCurrPosition = 0;
+                mCount = 0;
+                getNextPosition(mCurrPosition);
+                play(mCurrPosition);
+
+            } else if (mRepeatState == REPEAT_SINGLE) {
+                mCount--;
+                play(mCurrPosition);
+
+            } else if (mRepeatState == REPEAT_NORAML) {
+                getNextPosition(mCurrPosition);
+                play(mCurrPosition);
+            }
+        }
+    }
+
+    private void getNextPosition(int curPosition) {
+        if (mOrderState == ORDER_BY_ORDER) {
+            mCurrPosition++;
+        } else {
+            mCurrPosition = getRandomIndex(mList.size());
+            while (mCurrPosition == curPosition) {
+                mCurrPosition = getRandomIndex(mList.size());
+            }
+        }
     }
 
     public class MyReceiver extends BroadcastReceiver {
@@ -290,6 +365,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         public void onReceive(Context context, Intent intent) {
             mRepeatState = intent.getIntExtra(REPEAT, REPEAT_NORAML);
             mOrderState = intent.getIntExtra(ORDER, ORDER_BY_ORDER);
+            mMusicModel.isFavorite = intent.getBooleanExtra(MUSIC_FAVORITE, false);
+            setCache();
         }
     }
 }
