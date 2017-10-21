@@ -38,7 +38,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final int PLY_PLAY = 1;
     public static final int PLY_PAUSE = 2;
     public static final int PLY_CONTINUE = 3;
-    public static final int PLY_PRIVIOUS = 4;
+    public static final int PLY_PREVIOUS = 4;
     public static final int PLY_NEXT = 5;
     //
     public static final String REPEAT = "repeat";
@@ -86,6 +86,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return null;
     }
 
+    /**
+     * Create new service with given intents
+     * get cache and set service receiver
+     * set handler and pass to media player listener on completion
+     */
     @Override
     public void onCreate() {
         super.onCreate();
@@ -102,11 +107,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             public boolean handleMessage(Message message) {
                 if (message.what == 1) {
                     if (mPlayer != null) {
-                        mCurrentTime = mPlayer.getCurrentPosition(); // gain the position of music 获取当前音乐播放的位置
+                        // gets the position of music
+                        mCurrentTime = mPlayer.getCurrentPosition();
                         Intent intent = new Intent();
                         intent.setAction(BROADCAST_ACTION_CURRENT_TIME);
                         intent.putExtra(PLY_CURRENT_TIME, mCurrentTime);
-                        sendBroadcast(intent); // send Broadcast to MusicActivity 给MusicActivity发送广播
+                        // send Broadcast to MusicActivity
+                        sendBroadcast(intent);
                         mHandler.sendEmptyMessageDelayed(1, 1000);
                     }
                 }
@@ -116,6 +123,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mPlayer.setOnCompletionListener(this);
     }
 
+    /**
+     * switch to respective song action
+     * @param intent
+     * @param flags
+     * @param startId
+     * @return
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
@@ -136,7 +150,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             case PLY_CONTINUE:
                 resume();
                 break;
-            case PLY_PRIVIOUS:
+            case PLY_PREVIOUS:
                 int position = mCurrPosition;
                 if (mPrePositions.size() > 0) {
                     mPrePositions.remove(mPrePositions.size() - 1);
@@ -155,6 +169,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return START_STICKY;
     }
 
+    /**
+     * set receiver and filter for Service
+     */
     private void setReceiver() {
         mReceiver = new MyReceiver();
         IntentFilter filter = new IntentFilter();
@@ -162,6 +179,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         registerReceiver(mReceiver, filter);
     }
 
+    /**
+     * action: play song
+     * @param position
+     */
     private void play(int position) {
         try {
             mPlayer.reset();
@@ -180,7 +201,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             sendBroadcastToPlaying(mMusicModel);
             sendBroadcastToList(mMusicModel);
             //
-            if (mCurrPosition != -1 && mAction != PLY_PRIVIOUS) {
+            if (mCurrPosition != -1 && mAction != PLY_PREVIOUS) {
                 mPrePositions.add(mCurrPosition);
                 if (BuildConfig.DEBUG) {
                     SCLogHelper.w(TAG, "play mPrePositions", mPrePositions);
@@ -191,6 +212,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
+    /**
+     * action: pause song
+     */
     private void pause() {
         if (mPlayer != null && mPlayer.isPlaying()) {
             mPlayer.pause();
@@ -203,12 +227,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
+    /**
+     * action: resume song from pause
+     */
     private void resume() {
         if (!mPlayer.isPlaying()) {
             mPlayer.start();
         }
     }
 
+    /**
+     * action: move to previous song
+     * @param position
+     */
     private void previous(int position) {
         if (position >= 0) {
             play(position);
@@ -220,6 +251,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
+    /**
+     * action: move to next song
+     * @param position
+     */
     private void next(int position) {
         if (position <= mList.size() - 1) {
             play(position);
@@ -231,6 +266,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
+    /**
+     * set playlist cache
+     */
     private void setCache() {
         if (mMusicModel != null) {
             ACache.get(getBaseContext()).put(CACHE_MODEL, mMusicModel);
@@ -243,6 +281,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         ACache.get(getBaseContext()).put(CACHE_COUNT, mCount);
     }
 
+    /**
+     * get playlist cache
+     */
     private void getCache() {
         if (ACache.get(getBaseContext()).getAsString(MUSICLIST) != null) {
             String lists = ACache.get(getBaseContext()).getAsString(MUSICLIST);
@@ -266,6 +307,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
+    /**
+     * action: stop song and clear playlist cache
+     */
     private void stop() {
         if (mPlayer != null) {
             mPlayer.pause();
@@ -280,11 +324,20 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
+    /**
+     * get random index for shuffle state
+     * @param size
+     * @return
+     */
     private int getRandomIndex(int size) {
         Random random = new Random(new Random().nextLong());
         return random.nextInt(size);
     }
 
+    /**
+     * send broadcast to Now Playing fragment
+     * @param model
+     */
     private void sendBroadcastToPlaying(MusicModel model) {
         Intent intent = new Intent(BROADCAST_ACTION_NOW_PLAYING);
         Bundle bundle = new Bundle();
@@ -294,6 +347,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         sendBroadcast(intent);
     }
 
+    /**
+     * send broadcast to Playing List fragment
+     * @param model
+     */
     private void sendBroadcastToList(MusicModel model) {
         Intent intent = new Intent(MusicService.BROADCAST_ACTION_NEXT_SONGS);
         Bundle bundle = new Bundle();
@@ -303,6 +360,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         sendBroadcast(intent);
     }
 
+    /**
+     * destroy media player
+     */
     @Override
     public void onDestroy() {
         if (mPlayer != null) {
@@ -316,11 +376,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         unregisterReceiver(mReceiver);
     }
 
+    /**
+     * starts media player
+     * @param mediaPlayer
+     */
     @Override
     public void onPrepared(MediaPlayer mediaPlayer) {
         mediaPlayer.start();
     }
 
+    /**
+     * when playlist finishes playing (reach the end of playlist)
+     * @param mediaPlayer
+     */
     @Override
     public void onCompletion(MediaPlayer mediaPlayer) {
         mCount++;
@@ -359,6 +427,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         sendBroadcastToPlaying(mMusicModel);
     }
 
+    /**
+     * Get the next song's position/index
+     * @param curPosition
+     */
     private void getNextPosition(int curPosition) {
         if (mOrderState == ORDER_BY_ORDER) {
             mCurrPosition++;
@@ -372,6 +444,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public class MyReceiver extends BroadcastReceiver {
 
+        /**
+         * on receiving intent via broadcast, reset the song's three states
+         * @param context
+         * @param intent
+         */
         @Override
         public void onReceive(Context context, Intent intent) {
             mRepeatState = intent.getIntExtra(REPEAT, REPEAT_NORMAL);

@@ -242,7 +242,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
     }
 
     private void previous() {
-        startIntent(mLastPosition, MusicService.PLY_PRIVIOUS);
+        startIntent(mLastPosition, MusicService.PLY_PREVIOUS);
     }
 
     private void next() {
