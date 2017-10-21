@@ -67,7 +67,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private static final String TAG = "MusicService";
 
     //--------------------
-    private Handler mHandler;// use handler to receive the messages，to send the refresh duration of broadcast
+    private Handler mHandler;// handler用来接收消息，来发送广播更新播放时间
     private MyReceiver mReceiver;
     private MediaPlayer mPlayer;
     private List<MusicModel> mList;
@@ -102,17 +102,18 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             public boolean handleMessage(Message message) {
                 if (message.what == 1) {
                     if (mPlayer != null) {
-                        mCurrentTime = mPlayer.getCurrentPosition(); // gain the position of music 获取当前音乐播放的位置
+                        mCurrentTime = mPlayer.getCurrentPosition(); // 获取当前音乐播放的位置
                         Intent intent = new Intent();
                         intent.setAction(BROADCAST_ACTION_CURRENT_TIME);
                         intent.putExtra(PLY_CURRENT_TIME, mCurrentTime);
-                        sendBroadcast(intent); // send Broadcast to MusicActivity 给MusicActivity发送广播
+                        sendBroadcast(intent); // 给MusicActivity发送广播
                         mHandler.sendEmptyMessageDelayed(1, 1000);
                     }
                 }
                 return true;
             }
         });
+        //
         mPlayer.setOnCompletionListener(this);
     }
 
@@ -172,7 +173,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mMusicModel.isPlaying = true;
             //
             mPlayer.prepare();
-            mPlayer.setOnPreparedListener(this);// Register a listener
+            mPlayer.setOnPreparedListener(this);// 注册一个监听器
             //
             setCache();
             //

@@ -43,7 +43,7 @@ public class PlayingFragment extends BaseFragment {
     @ViewById(R.id.tvTotalTime)
     TextView tvTotalTime;
     //
-    private PlayingReceiver mPlayingReceiver;  //customize the Broadcast Receiver
+    private PlayingReceiver mPlayingReceiver;  //自定义的广播接收器
     private MusicModel mMusicModel;
     //
     private int mRepeatState = MusicService.REPEAT_NORAML;
@@ -75,11 +75,6 @@ public class PlayingFragment extends BaseFragment {
         }
     }
 
-    /**
-     * get music info to display
-     * set repeat, shuffle state
-     * @param musicModel a song
-     */
     private void setMusicInfo(MusicModel musicModel) {
 
         if (musicModel == null) {
@@ -126,17 +121,14 @@ public class PlayingFragment extends BaseFragment {
         tvTotalTime.setText(formatTime(Integer.parseInt(musicModel.mDuration)));
     }
 
-    /**
-     * set receiver to get info from service
-     */
     private void setReceiver() {
         mPlayingReceiver = new PlayingReceiver();
-        // Create IntentFilter
+        // 创建IntentFilter
         IntentFilter filter = new IntentFilter();
-        // set the listener's of BroadcastReceiver
+        // 指定BroadcastReceiver监听的Action
         filter.addAction(MusicService.BROADCAST_ACTION_NOW_PLAYING);
         filter.addAction(MusicService.BROADCAST_ACTION_CURRENT_TIME);
-        // register BroadcastReceiver
+        // 注册BroadcastReceiver
         mContext.registerReceiver(mPlayingReceiver, filter);
     }
 
