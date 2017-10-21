@@ -37,6 +37,7 @@ public class PlayingFragment extends BaseFragment {
     @ViewById(R.id.ib_shuffle)
     ImageButton ib_shuffle;
     @ViewById(R.id.ib_favorite)
+
     ImageButton ib_favorite;
     @ViewById(R.id.tvCurTime)
     TextView tvCurTime;

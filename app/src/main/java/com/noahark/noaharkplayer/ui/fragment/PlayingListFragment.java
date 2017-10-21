@@ -79,7 +79,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
             lvMusics.setVisibility(View.INVISIBLE);
             tvEmpty.setVisibility(View.VISIBLE);
         }
-        // set boradcast to change UI
+        // set broadcast to change UI
         setReceiver();
         // get last song played
         getCache();
@@ -94,7 +94,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
         }
         //
         startServiceNow();
-        //
+        //start the service
         if (mMusicModel != null && mLastPosition < mMusicList.size()) {
             setPlayingIcon(mLastPosition, mMusicModel.isPlaying);
             setPlayBarInfo(mMusicModel);

@@ -75,10 +75,10 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
     }
 
     /**
-     * 跳转Activity，带有Bundle参数，如果该Activity已启动过，则不启动新的；
+     *  jump into Activity, with Bundle parameter, if the Activity is started up, it will not start new one; 已启动过，则不启动新的；
      *
-     * @param paramClass Activity参数
-     * @param bundle     Bundle参数
+     * @param paramClass Activity parameter
+     * @param bundle     Bundle parameter
      */
     private void doGotoActivity(Class<?> paramClass, Bundle bundle) {
         Intent lIntent = new Intent(this.getBaseContext(), paramClass);
@@ -90,11 +90,11 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
     }
 
     /**
-     * 跳转Activity，带有Bundle参数，可以设置启动模式；
+     * jump into Activity, with Bundle parameter，it could set start mode 可以设置启动模式；
      *
-     * @param paramClass Activity参数
-     * @param bundle     Bundle参数
-     * @param intentFlag 　启动模式
+     * @param paramClass Activity parameter
+     * @param bundle     Bundle parameter
+     * @param intentFlag 　start the mode
      * @see Intent
      */
     private void doGotoActivity(Class<?> paramClass, Bundle bundle, int intentFlag) {

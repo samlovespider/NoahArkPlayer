@@ -8,25 +8,25 @@ import android.os.Bundle;
 public interface MyBaseFragmentImp {
 
     /**
-     * 跳转Activity；
+     * jump into Activity；
      *
-     * @param paramClass Activity参数
+     * @param paramClass Activity parameter
      */
     void gotoActivity(Class<?> paramClass);
 
     /**
-     * 跳转Activity，带有Bundle参数；
+     * jump into Activity, with Bundle param；
      *
-     * @param paramClass Activity参数
-     * @param bundle     Bundle参数
+     * @param paramClass Activity parameter
+     * @param bundle     Bundle parameter
      */
     void gotoActivity(Class<?> paramClass, Bundle bundle);
 
     /**
-     * 跳转Activity，带有Bundle参数，并且该Activity不会压入栈中，返回后自动关闭；
+     * jump into Activity, with Bundle param, and Activity will not into stack, after returning and close automatically
      *
-     * @param paramClass Activity参数
-     * @param bundle     Bundle参数
+     * @param paramClass Activity parameter
+     * @param bundle     Bundle parameter
      */
     void gotoActivityNoHistory(Class<?> paramClass, Bundle bundle);
 
