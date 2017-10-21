@@ -44,9 +44,10 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
     //
     public static final String MUSICLIST = "musiclist";
     //
+    @ViewById(R.id.tvEmpty)
+    TextView tvEmpty;
     @ViewById(R.id.lvMusics)
     ListView lvMusics;
-    // playbar
     @ViewById(R.id.ivAlbum)
     ImageView ivAlbum;
     @ViewById(R.id.tvMusicName)
@@ -73,15 +74,20 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
         }
         // get music list
         setList();
+        //
+        if (mMusicList == null || mMusicList.size() < 1) {
+            lvMusics.setVisibility(View.INVISIBLE);
+            tvEmpty.setVisibility(View.VISIBLE);
+        }
         // set boradcast to change UI
         setReceiver();
         // get last song played
         getCache();
-        if (mLastPosition != -1) {
+        if (mLastPosition != -1 && mLastPosition < mMusicList.size()) {
             setPlayBarInfo(mMusicList.get(mLastPosition));
         }
         // load music album
-        if (mMusicList != null) {
+        if (mMusicList != null && mMusicList.size() > 0) {
             MusicAlbumLoadTask task = new MusicAlbumLoadTask(mContext, mMusicList);
             task.setLoadTaskListener(this);
             task.execute(mMusicList.toArray());
@@ -89,7 +95,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
         //
         startServiceNow();
         //
-        if (mMusicModel != null) {
+        if (mMusicModel != null && mLastPosition < mMusicList.size()) {
             setPlayingIcon(mLastPosition, mMusicModel.isPlaying);
             setPlayBarInfo(mMusicModel);
         }
@@ -129,7 +135,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
     @Click({R.id.ibPreviouse, R.id.ibNext, R.id.ibPlay, R.id.relPlayBar})
     @Override
     public void initClick(View view) {
-        if (mMusicList == null) {
+        if (mMusicList == null || mMusicModel == null) {
             return;
         }
         switch (view.getId()) {

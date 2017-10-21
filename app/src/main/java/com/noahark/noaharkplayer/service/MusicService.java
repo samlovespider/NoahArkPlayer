@@ -73,12 +73,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private List<MusicModel> mList;
     private List<Integer> mPrePositions;
     private MusicModel mMusicModel;
-    private int mCurrPosition;
+    private int mCurrPosition = -1;
     private int mRepeatState = REPEAT_NORAML;
     private int mOrderState = ORDER_BY_ORDER;
-    private int mCurrentTime;
+    private int mCurrentTime = 0;
     private int mAction;
-    private int mCount;// count how much songs already played
+    private int mCount = 0;// count how much songs already played
 
     @Nullable
     @Override
@@ -231,10 +231,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     }
 
     private void setCache() {
+        if (mMusicModel != null) {
+            ACache.get(getBaseContext()).put(CACHE_MODEL, mMusicModel);
+        }
+        if (mCurrPosition != -1) {
+            ACache.get(getBaseContext()).put(CACHE_POSITION, mCurrPosition);
+        }
         ACache.get(getBaseContext()).put(CACHE_ORDER, mOrderState);
         ACache.get(getBaseContext()).put(CACHE_REPEAT, mRepeatState);
-        ACache.get(getBaseContext()).put(CACHE_MODEL, mMusicModel);
-        ACache.get(getBaseContext()).put(CACHE_POSITION, mCurrPosition);
         ACache.get(getBaseContext()).put(CACHE_COUNT, mCount);
     }
 

@@ -4,6 +4,16 @@
                 android:layout_height="match_parent"
                 tools:context="com.noahark.noaharkplayer.ui.fragment.PlayingListFragment">
 
+    <TextView
+        android:id="@+id/tvEmpty"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:drawableTop="@drawable/pic_no_music"
+        android:text="There is no Song"
+        android:textSize="26sp"
+        android:visibility="gone"/>
+
     <ListView
         android:id="@+id/lvMusics"
         android:layout_width="match_parent"
