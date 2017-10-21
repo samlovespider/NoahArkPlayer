@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">NoahArkPlayer</string>
+    <string name="service_name">NoahArkPlayer</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment1">Hello blank fragment1</string>
+    <string name="hello_blank_fragment2">Hello blank fragment2</string>
+</resources>

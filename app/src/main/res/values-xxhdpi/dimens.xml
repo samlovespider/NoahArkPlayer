@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="fragment_playing_pic_play_width">240dp</dimen>
+</resources>

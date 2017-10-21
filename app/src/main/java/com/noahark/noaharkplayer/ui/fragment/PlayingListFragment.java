@@ -163,7 +163,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
     @ItemClick(R.id.lvMusics)
     @Override
     public void initItemClick(int position) {
-        if (mLastPosition == position) {
+        if (mMusicList.get(position).isPlaying && mLastPosition == position) {
             mLastPosition = -1;
             setPlayingIcon(position, false);
             setPlayBarInfo(mMusicList.get(position));

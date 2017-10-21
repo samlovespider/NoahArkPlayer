@@ -48,8 +48,8 @@
 
         <ImageButton
             android:id="@+id/ibPlay"
-            android:layout_width="240dp"
-            android:layout_height="240dp"
+            android:layout_width="@dimen/fragment_playing_pic_play_width"
+            android:layout_height="@dimen/fragment_playing_pic_play_width"
             android:layout_centerInParent="true"
             android:background="@drawable/pic_music_play_pause"/>
     </RelativeLayout>

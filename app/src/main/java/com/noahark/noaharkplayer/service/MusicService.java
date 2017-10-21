@@ -126,6 +126,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * switch to respective song action
+     *
      * @param intent
      * @param flags
      * @param startId
@@ -182,6 +183,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * action: play song
+     *
      * @param position
      */
     private void play(int position) {
@@ -239,6 +241,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * action: move to previous song
+     *
      * @param position
      */
     private void previous(int position) {
@@ -254,6 +257,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * action: move to next song
+     *
      * @param position
      */
     private void next(int position) {
@@ -327,6 +331,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * get random index for shuffle state
+     *
      * @param size
      * @return
      */
@@ -337,6 +342,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * send broadcast to Now Playing fragment
+     *
      * @param model
      */
     private void sendBroadcastToPlaying(MusicModel model) {
@@ -350,6 +356,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * send broadcast to Playing List fragment
+     *
      * @param model
      */
     private void sendBroadcastToList(MusicModel model) {
@@ -379,6 +386,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * starts media player
+     *
      * @param mediaPlayer
      */
     @Override
@@ -388,6 +396,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * when playlist finishes playing (reach the end of playlist)
+     *
      * @param mediaPlayer
      */
     @Override
@@ -430,15 +439,23 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     /**
      * Get the next song's position/index
+     *
      * @param curPosition
      */
     private void getNextPosition(int curPosition) {
         if (mOrderState == ORDER_BY_ORDER) {
-            mCurrPosition++;
+            if (mRepeatState != REPEAT_SINGLE) {
+                mCurrPosition++;
+                if (mCurrPosition >= mList.size() && mRepeatState == REPEAT_LOOP_ALL) {
+                    mCurrPosition = 0;
+                }
+            }
         } else {
-            mCurrPosition = getRandomIndex(mList.size());
-            while (mCurrPosition == curPosition) {
+            if (mRepeatState != REPEAT_SINGLE) {
                 mCurrPosition = getRandomIndex(mList.size());
+                while (mCurrPosition == curPosition) {
+                    mCurrPosition = getRandomIndex(mList.size());
+                }
             }
         }
     }
@@ -447,6 +464,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         /**
          * on receiving intent via broadcast, reset the song's three states
+         *
          * @param context
          * @param intent
          */
