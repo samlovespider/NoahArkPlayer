@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -19,6 +20,8 @@ import com.shinelw.library.ColorArcProgressBar;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.ViewById;
+
+import java.util.Locale;
 
 @EFragment(R.layout.fragment_playing)
 public class PlayingFragment extends BaseFragment {
@@ -227,24 +230,36 @@ public class PlayingFragment extends BaseFragment {
         mContext.startService(intent);
     }
 
+//    private String formatTime(long time) {
+//        String min = time / (1000 * 60) + "";
+//        String sec = time % (1000 * 60) + "";
+//        if (min.length() < 2) {
+//            min = "0" + time / (1000 * 60) + "";
+//        } else {
+//            min = time / (1000 * 60) + "";
+//        }
+//        if (sec.length() == 4) {
+//            sec = "0" + (time % (1000 * 60)) + "";
+//        } else if (sec.length() == 3) {
+//            sec = "00" + (time % (1000 * 60)) + "";
+//        } else if (sec.length() == 2) {
+//            sec = "000" + (time % (1000 * 60)) + "";
+//        } else if (sec.length() == 1) {
+//            sec = "0000" + (time % (1000 * 60)) + "";
+//        }
+//        return min + ":" + sec.trim().substring(0, 2);
+//    }
+
     private String formatTime(long time) {
-        String min = time / (1000 * 60) + "";
-        String sec = time % (1000 * 60) + "";
-        if (min.length() < 2) {
-            min = "0" + time / (1000 * 60) + "";
-        } else {
-            min = time / (1000 * 60) + "";
-        }
-        if (sec.length() == 4) {
-            sec = "0" + (time % (1000 * 60)) + "";
-        } else if (sec.length() == 3) {
-            sec = "00" + (time % (1000 * 60)) + "";
-        } else if (sec.length() == 2) {
-            sec = "000" + (time % (1000 * 60)) + "";
-        } else if (sec.length() == 1) {
-            sec = "0000" + (time % (1000 * 60)) + "";
-        }
-        return min + ":" + sec.trim().substring(0, 2);
+        return formatTime("mm:ss", time);
+    }
+
+    public static String formatTime(String pattern, long milli) {
+        int m = (int) (milli / DateUtils.MINUTE_IN_MILLIS);
+        int s = (int) ((milli / DateUtils.SECOND_IN_MILLIS) % 60);
+        String mm = String.format(Locale.getDefault(), "%02d", m);
+        String ss = String.format(Locale.getDefault(), "%02d", s);
+        return pattern.replace("mm", mm).replace("ss", ss);
     }
 
     @Override
