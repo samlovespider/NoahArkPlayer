@@ -60,7 +60,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
     private MusicListAdapter mMusicListAdapter;
     private List<MusicModel> mMusicList;
     private MusicModel mMusicModel;
-    private HomeReceiver mHomeReceiver;  //自定义的广播接收器
+    private HomeReceiver mHomeReceiver;  //customize the receiver of broadcast
     private Intent mServiceIntent;
     private int mLastPosition = -1;
 
@@ -109,12 +109,12 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
 
     private void setReceiver() {
         mHomeReceiver = new HomeReceiver();
-        // 创建IntentFilter
+        // Creater IntentFilter
         IntentFilter filter = new IntentFilter();
-        // 指定BroadcastReceiver监听的Action
+        // set the listener's of BroadcastReceiver
         filter.addAction(MusicService.BROADCAST_ACTION_NEXT_SONGS);
         filter.addAction(MusicService.BROADCAST_ACTION_NOW_PLAYING);
-        // 注册BroadcastReceiver
+        // Register BroadcastReceiver
         mContext.registerReceiver(mHomeReceiver, filter);
     }
 
@@ -338,10 +338,10 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
                 int position = intent.getExtras().getInt(MusicService.MUSIC_POSITION, mLastPosition);
                 //
                 setPlayBarInfo(mMusicModel);
-                //
+                //Refresh the bar information
                 setPlayingIcon(mLastPosition, false);
                 setPlayingIcon(position, mMusicModel.isPlaying);
-                //
+                //Refresh the playing Icon
                 mLastPosition = position;
 
             } else if (action.equals(MusicService.BROADCAST_ACTION_NOW_PLAYING)) {
