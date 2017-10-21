@@ -4,7 +4,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 
-import com.caizhenliang.mylibrary.ui.fragment.MyBaseFragment;
 import com.noahark.noaharkplayer.BuildConfig;
 
 import org.androidannotations.annotations.AfterViews;
@@ -15,6 +14,7 @@ import org.androidannotations.annotations.EFragment;
  */
 @EFragment
 abstract public class BaseFragment extends MyBaseFragment {
+
 
     @AfterViews
     @Override

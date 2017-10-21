@@ -1,48 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:paddingRight="15dp">
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+    <ImageView
+        android:id="@+id/ivAlbum"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_centerVertical="true"
+        android:layout_margin="10dp"
+        android:src="@drawable/ic_empty_music_album"/>
+
+    <ImageView
+        android:id="@+id/ivPlaying"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="20dp"
+        android:src="@drawable/ic_activity_main_bar_play_normal"/>
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:clickable="true"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tv_music_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="music name"
-                android:textSize="20sp"
-                android:textColor="@color/item_selector"
-                android:paddingTop="3sp"/>
-
-            <TextView
-                android:id="@+id/tv_Artist"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:textSize="12sp"
-                android:text="Artist" />
-        </LinearLayout>
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="20dp"
+        android:layout_toLeftOf="@+id/ivPlaying"
+        android:layout_toRightOf="@+id/ivAlbum"
+        android:orientation="vertical">
 
         <TextView
-            android:id="@+id/tv_Duration"
+            android:id="@+id/tvMusicName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="right|center_vertical"
-            android:text="00:00"
-            android:textSize="12sp"
-            android:paddingBottom="15sp"/>
+            android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:text="Centuries"
+            android:textColor="@color/black"
+            android:textSize="14sp"/>
 
-
+        <TextView
+            android:id="@+id/tvAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="3dp"
+            android:maxLines="1"
+            android:text="Fall Out Boy"
+            android:textSize="11sp"/>
     </LinearLayout>
-
-</LinearLayout>
+</RelativeLayout>

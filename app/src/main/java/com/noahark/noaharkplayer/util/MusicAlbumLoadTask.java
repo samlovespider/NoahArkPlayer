@@ -14,14 +14,14 @@ import java.util.List;
 /**
  * Created by caizhenliang on 2017/8/31.
  */
-public class ImageLoadTask extends AsyncTask<Object, Integer, Integer> {
+public class MusicAlbumLoadTask extends AsyncTask<Object, Integer, Integer> {
 
     //
     private List<MusicModel> mModelList;
     private LoadTaskListener mLoadTaskListener;
     private Context mContext;
 
-    public ImageLoadTask(Context sContext, List<MusicModel> sModelList) {
+    public MusicAlbumLoadTask(Context sContext, List<MusicModel> sModelList) {
         mModelList = sModelList;
         mContext = sContext;
     }
@@ -41,12 +41,17 @@ public class ImageLoadTask extends AsyncTask<Object, Integer, Integer> {
         }
     }
 
-
     @Override
     protected Integer doInBackground(Object... params) {
         for (int i = 0; i < params.length; i++) {
             MusicModel musicModel = (MusicModel) params[i];
-            mModelList.get(i).setmBitmap(createAlbumPic(musicModel.mAlbumID));
+
+            if (musicModel.mAlbumID != null) {
+                if (createAlbumPic(musicModel.mAlbumID) != null) {
+                    Bitmap bitmap = createAlbumPic(musicModel.mAlbumID);
+                    mModelList.get(i).setmBitmap(bitmap);
+                }
+            }
         }
         return 1;
     }
@@ -58,7 +63,11 @@ public class ImageLoadTask extends AsyncTask<Object, Integer, Integer> {
     private Bitmap createAlbumPic(String sAlbumID) {
         if (!sAlbumID.isEmpty()) {
             String albumFile = getAlbumArt(sAlbumID);
-            return BitmapFactory.decodeFile(albumFile);
+            if (albumFile == null || albumFile.isEmpty()) {
+                return null;
+            } else {
+                return BitmapFactory.decodeFile(albumFile);
+            }
         } else {
             return null;
         }

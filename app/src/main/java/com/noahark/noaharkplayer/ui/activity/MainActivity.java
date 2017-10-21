@@ -1,84 +1,120 @@
 package com.noahark.noaharkplayer.ui.activity;
 
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.ListView;
-import android.widget.SeekBar;
-import android.widget.TextView;
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.view.Window;
 
+import com.flyco.tablayout.SegmentTabLayout;
+import com.flyco.tablayout.listener.OnTabSelectListener;
 import com.noahark.noaharkplayer.R;
-import com.noahark.noaharkplayer.adapter.MusicListAdapter;
 import com.noahark.noaharkplayer.base.ui.BaseActivity;
-import com.noahark.noaharkplayer.model.MusicModel;
+import com.noahark.noaharkplayer.ui.fragment.PlayingFragment;
+import com.noahark.noaharkplayer.ui.fragment.PlayingFragment_;
+import com.noahark.noaharkplayer.ui.fragment.PlayingListFragment;
+import com.noahark.noaharkplayer.ui.fragment.PlayingListFragment_;
 
-import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.WindowFeature;
 
 import java.util.ArrayList;
-import java.util.List;
 
+/**
+ * Peter Chiu, 08569541
+ * Yuanda Huo, 16417122
+ * Zhenliang Cai, 17108093
+ */
+@WindowFeature(Window.FEATURE_NO_TITLE)
 @EActivity(R.layout.activity_main)
 public class MainActivity extends BaseActivity {
 
-
-    @ViewById(R.id.lvMusics)
-    ListView lvMusics;
-    @ViewById(R.id.linController)
-    LinearLayout linController;
-    @ViewById(R.id.tvCurrentTime)
-    TextView tvCurrentTime;
-    @ViewById(R.id.tvTotalTime)
-    TextView tvTotalTime;
-    @ViewById(R.id.sbTime)
-    SeekBar sbTime;
-
-    private List<MusicModel> mMusicList;
+    public static final int CODE_FOR_WRITE_PERMISSION = 1;
+    //
+    @ViewById(R.id.stlLay)
+    SegmentTabLayout stlLay;
+    @ViewById(R.id.vpPlaying)
+    ViewPager vpPlaying;
+    //
+    private ArrayList<Fragment> mFragments = new ArrayList<>();
+    private PlayingListFragment mPlayingListFragment;
 
     @Override
     public void initView() {
-//        gotoActivity(MusicActivity_.class);
-//        mMusicList = getMusics();
-//        if (mMusicList != null) {
-//            mImageLoadTask = new ImageLoadTask(this, mMusicList);
-//            mImageLoadTask.execute(mMusicList.toArray());
-//            mImageLoadTask.setLoadTaskListener(new LoadTaskListener() {
-//                @Override
-//                public void loadTask(List<MusicModel> musicModels) {
-//                    MusicListAdapter musicListAdapter = new MusicListAdapter(MainActivity.this, mMusicList);
-//                    lvMusics.setAdapter(musicListAdapter);
-//                }
-//            });
-//        }
-        setList();
+
+        //
+        PlayingFragment playingFragment = new PlayingFragment_();
+        mPlayingListFragment = new PlayingListFragment_();
+        mFragments.add(playingFragment);
+        mFragments.add(mPlayingListFragment);
+
+        MyPagerAdapter mMyPagerAdapter = new MyPagerAdapter(getSupportFragmentManager(), mFragments);
+        vpPlaying.setAdapter(mMyPagerAdapter);
+
+        stlLay.setTabData(new String[]{"Playing", "List"});
+        stlLay.setOnTabSelectListener(new OnTabSelectListener() {
+            @Override
+            public void onTabSelect(int position) {
+                vpPlaying.setCurrentItem(position);
+            }
+
+            @Override
+            public void onTabReselect(int position) {
+            }
+        });
+
+        vpPlaying.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                stlLay.setCurrentTab(position);
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+        vpPlaying.setCurrentItem(0);
     }
 
-    
-
-    @Click({R.id.btnPeter, R.id.btnSam, R.id.btnFrank})
     @Override
-    public void initClick(View view) {
-        switch (view.getId()) {
-            case R.id.btnPeter:
-                break;
-            case R.id.btnSam:
-                gotoActivity(MusicActivity_.class);
-                break;
-            case R.id.btnFrank:
-                gotoActivity(PlayingActivity_.class);
-                break;
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == CODE_FOR_WRITE_PERMISSION) {
+            if (permissions[0].equals(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                //
+                mPlayingListFragment.initView();
+            } else {
+                finish();
+            }
         }
     }
 
-    private void setList() {
-        mMusicList = new ArrayList<>();
-        for (int i = 0; i < 20; i++) {
-            MusicModel model = new MusicModel("1" + i, "2" + i, "3" + i, "4" + i, "5" + i, "6" + i, "7" + i, "8" + i);
-            mMusicList.add(model);
+    private class MyPagerAdapter extends FragmentPagerAdapter {
+        private ArrayList<Fragment> mFragments;
+
+        private MyPagerAdapter(FragmentManager fm, ArrayList<Fragment> sFragments) {
+            super(fm);
+            mFragments = sFragments;
         }
-        MusicListAdapter musicListAdapter = new MusicListAdapter(this, mMusicList);
-        lvMusics.setAdapter(musicListAdapter);
+
+        @Override
+        public Fragment getItem(int position) {
+            return mFragments.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return mFragments.size();
+        }
     }
-
-
 }

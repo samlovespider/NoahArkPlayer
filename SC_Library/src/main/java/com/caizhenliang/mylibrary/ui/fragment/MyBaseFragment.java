@@ -1,5 +1,6 @@
 package com.caizhenliang.mylibrary.ui.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -30,18 +31,21 @@ abstract public class MyBaseFragment extends Fragment implements MyBaseFragmentI
     protected String TAG = getClass().getSimpleName();
     //
     protected MyAlertDialogTool mAlertDialogTool;//use to create alertdialog
-    protected ACache mACache;
+    protected ACache mCache;
     protected AsyncHttpClient mHttpClient;
+    protected Context mContext;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        //
+        mContext = getContext();
         // init AlertDialog
         mAlertDialogTool = new MyAlertDialogTool(getActivity().getBaseContext());
         // init Eventbus
         SCBus.getInstance().register(this);
         // init ACache
-        mACache = ACache.get(getActivity().getBaseContext());
+        mCache = ACache.get(getActivity().getBaseContext());
         // init AsyncHttpClient
         mHttpClient = new AsyncHttpClient();
     }

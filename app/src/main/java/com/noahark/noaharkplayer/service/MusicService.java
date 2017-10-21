@@ -6,64 +6,79 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.media.MediaPlayer;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.support.annotation.Nullable;
 
-import com.caizhenliang.mylibrary.util.SCCache;
+import com.alibaba.fastjson.JSONArray;
+import com.noahark.noaharkplayer.BuildConfig;
+import com.noahark.noaharkplayer.base.util.ACache;
+import com.noahark.noaharkplayer.base.util.SCLogHelper;
 import com.noahark.noaharkplayer.model.MusicModel;
 
-import org.androidannotations.annotations.EService;
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import static com.noahark.noaharkplayer.ui.activity.MusicActivity.MUSICLIST;
+import static com.noahark.noaharkplayer.ui.fragment.PlayingListFragment.MUSICLIST;
 
 /**
  * @author caizhenliang
  */
-@EService
-public class MusicService extends Service {
+public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
 
-    public static final String PLY_ACTION = "action";
-    public static final String PLY_DATA = "data";
-    public static final String PLY_POSITION = "position";
-    public static final String PLY_CURRENT_TIME = "currenttime";
-    public static final String PLY_DURATION = "duration";
+    //
+    public static final String MUSIC_ACTION = "action";
+    public static final String MUSIC_POSITION = "position";
+    public static final String MUSIC_MODEL = "model";
+    public static final String MUSIC_FAVORITE = "favorite";
+    //
     public static final int PLY_PLAY = 1;
     public static final int PLY_PAUSE = 2;
-    public static final int PLY_STOP = 3;
-    public static final int PLY_CONTINUE = 4;
-    public static final int PLY_PRIVIOUS = 5;
-    public static final int PLY_NEXT = 6;
-    public static final int PLY_PROGRESS = 7;
-    public static final int PLY_PLAYING = 8;
+    public static final int PLY_CONTINUE = 3;
+    public static final int PLY_PRIVIOUS = 4;
+    public static final int PLY_NEXT = 5;
     //
-    public static final String STATUS = "status";
-    public static final int STATUS_SINGLE = 1;
-    public static final int STATUS_LOOP_ALL = 2;
-    public static final int STATUS_BY_ORDER = 3;
-    public static final int STATUS_BY_RANDOM = 4;
+    public static final String REPEAT = "repeat";
+    public static final int REPEAT_NORAML = 0;
+    public static final int REPEAT_SINGLE = 1;
+    public static final int REPEAT_LOOP_ALL = 2;
     //
-    public static final String ACTION_UPDATE_ACTION = "com.noahark.action.UPDATE_ACTION";  //更新动作
-    public static final String ACTION_CTL_ACTION = "com.noahark.action.CTL_ACTION";        //控制动作
-    public static final String ACTION_MUSIC_CURRENT = "com.noahark.action.MUSIC_CURRENT";  //当前音乐播放时间更新动作
-    public static final String ACTION_MUSIC_DURATION = "com.noahark.action.MUSIC_DURATION";//新音乐长度更新动作
-    public static final String ACTION_REPEAT_ACTION = "com.noahark.action.REPEAT_ACTION";
-    public static final String ACTION_SHUFFLE_ACTION = "com.noahark.action.SHUFFLE_ACTION";
+    public static final String ORDER = "order";
+    public static final int ORDER_BY_ORDER = 3;
+    public static final int ORDER_BY_RANDOM = 4;
     //
-    private MediaPlayer mMediaPlayer;
+    public static final String CACHE_MODEL = "cache_model";
+    public static final String CACHE_POSITION = "cache_position";
+    public static final String CACHE_REPEAT = "cache_repeat";
+    public static final String CACHE_ORDER = "cache_order";
+    public static final String CACHE_COUNT = "cache_count";
+    //
+    public static final String SERVICE_ACTION = "com.noahark.musicservice";
+    public static final String BROADCAST_ACTION_CHANGE_STATUS = "com.noahark.action.change_status";
+    public static final String BROADCAST_ACTION_NEXT_SONGS = "com.noahark.action.next_songs";
+    public static final String BROADCAST_ACTION_CURRENT_TIME = "com.noahark.action.current_time";
+    public static final String BROADCAST_ACTION_NOW_PLAYING = "com.noahark.action.now_playing";
+    //----------------------------------------------------------------
+    public static final String PLY_CURRENT_TIME = "currenttime";
+    //
+    private static final String TAG = "MusicService";
+
+    //--------------------
+    private Handler mHandler;// use handler to receive the messages，to send the refresh duration of broadcast
     private MyReceiver mReceiver;
-    private List<MusicModel> mMusicList;
-    private Handler handler;// handler用来接收消息，来发送广播更新播放时间
-    //
-    private int mCurrentPosition;
-    private int mCurrentTime;
-    private int mPlayStatus = STATUS_BY_ORDER;
-    private int mDuration;
-    private String mData;
+    private MediaPlayer mPlayer;
+    private List<MusicModel> mList;
+    private List<Integer> mPrePositions;
+    private MusicModel mMusicModel;
+    private int mCurrPosition = -1;
+    private int mRepeatState = REPEAT_NORAML;
+    private int mOrderState = ORDER_BY_ORDER;
+    private int mCurrentTime = 0;
+    private int mAction;
+    private int mCount = 0;// count how much songs already played
 
     @Nullable
     @Override
@@ -74,199 +89,284 @@ public class MusicService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
-        handler = new Handler(new Handler.Callback() {
+        //
+        mPlayer = new MediaPlayer();
+        mPrePositions = new ArrayList<>();
+        //
+        getCache();
+        //
+        setReceiver();
+        // send broadcast to PlayingListFragment
+        mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message message) {
                 if (message.what == 1) {
-                    if (mMediaPlayer != null) {
-                        mCurrentTime = mMediaPlayer.getCurrentPosition(); // 获取当前音乐播放的位置
+                    if (mPlayer != null) {
+                        mCurrentTime = mPlayer.getCurrentPosition(); // gain the position of music 获取当前音乐播放的位置
                         Intent intent = new Intent();
-                        intent.setAction(ACTION_MUSIC_CURRENT);
+                        intent.setAction(BROADCAST_ACTION_CURRENT_TIME);
                         intent.putExtra(PLY_CURRENT_TIME, mCurrentTime);
-                        sendBroadcast(intent); // 给MusicActivity发送广播
-                        handler.sendEmptyMessageDelayed(1, 1000);
+                        sendBroadcast(intent); // send Broadcast to MusicActivity 给MusicActivity发送广播
+                        mHandler.sendEmptyMessageDelayed(1, 1000);
                     }
                 }
                 return true;
             }
         });
-
-        mMediaPlayer = new MediaPlayer();
-        mMusicList = SCCache.getInstance(getBaseContext()).get(MUSICLIST, MusicModel.class);
-
-        mMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mediaPlayer) {
-                switch (mPlayStatus) {
-                    case STATUS_SINGLE:
-                        mediaPlayer.start();
-                        break;
-                    case STATUS_LOOP_ALL:
-                        if (++mCurrentPosition > mMusicList.size() - 1) {  //变为第一首的位置继续播放
-                            mCurrentPosition = 0;
-                        }
-                        doWhenComplete(mCurrentPosition);
-                        break;
-                    case STATUS_BY_ORDER:
-                        if (++mCurrentPosition <= mMusicList.size() - 1) {
-                            doWhenComplete(mCurrentPosition);
-                        } else {
-                            mediaPlayer.seekTo(0);
-                            mCurrentPosition = 0;
-                            Intent sendIntent = new Intent(ACTION_UPDATE_ACTION);
-                            sendIntent.putExtra(PLY_POSITION, mCurrentPosition);
-                            sendBroadcast(sendIntent);
-                        }
-                        break;
-                    case STATUS_BY_RANDOM:
-                        mCurrentPosition = getRandomIndex(mMusicList.size() - 1);
-                        doWhenComplete(mCurrentPosition);
-                        break;
-                }
-            }
-        });
-
-        //
-        setReceiver();
+        mPlayer.setOnCompletionListener(this);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        mData = intent.getStringExtra(PLY_DATA);
-        mCurrentPosition = intent.getIntExtra(PLY_POSITION, -1);
-        //
-        int action = intent.getIntExtra(PLY_ACTION, 0);
-        switch (action) {
+
+        if (intent == null) {
+            return START_STICKY;
+        }
+
+        mCurrPosition = intent.getIntExtra(MUSIC_POSITION, -1);
+        mAction = intent.getIntExtra(MUSIC_ACTION, -1);
+
+        switch (mAction) {
             case PLY_PLAY:
-                play(0);
+                play(mCurrPosition);
                 break;
             case PLY_PAUSE:
                 pause();
-                break;
-            case PLY_STOP:
-                stop();
                 break;
             case PLY_CONTINUE:
                 resume();
                 break;
             case PLY_PRIVIOUS:
-                previous();
+                int position = mCurrPosition;
+                if (mPrePositions.size() > 0) {
+                    mPrePositions.remove(mPrePositions.size() - 1);
+                }
+                if (mPrePositions.size() > 0) {
+                    position = mPrePositions.get(mPrePositions.size() - 1);
+                    mCurrPosition = position;
+                }
+                previous(position);
                 break;
             case PLY_NEXT:
-                next();
-                break;
-            case PLY_PROGRESS:
-                mCurrentTime = intent.getIntExtra(PLY_CURRENT_TIME, -1);
-                play(mCurrentTime);
-                break;
-            case PLY_PLAYING:
-                handler.sendEmptyMessage(1);
+                getNextPosition(mCurrPosition);
+                next(mCurrPosition);
                 break;
         }
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
-    public void onDestroy() {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
-            mMediaPlayer.release();
-            mMediaPlayer = null;
-        }
-    }
-
-    private void doWhenComplete(int currentPosition) {
-        Intent sendIntent = new Intent(ACTION_UPDATE_ACTION);
-        sendIntent.putExtra(PLY_POSITION, currentPosition);
-        // 发送广播，将被Activity组件中的BroadcastReceiver接收到
-        sendBroadcast(sendIntent);
-        mData = mMusicList.get(currentPosition).mData;
-        play(0);
+        return START_STICKY;
     }
 
     private void setReceiver() {
         mReceiver = new MyReceiver();
         IntentFilter filter = new IntentFilter();
-        filter.addAction(ACTION_CTL_ACTION);
+        filter.addAction(BROADCAST_ACTION_CHANGE_STATUS);
         registerReceiver(mReceiver, filter);
     }
 
-    private int getRandomIndex(int end) {
-        Random random = new Random(new Random().nextLong());
-        return random.nextInt() * end;
-    }
-
-    private void play(int currentTime) {
+    private void play(int position) {
         try {
-            mMediaPlayer.reset();// 把各项参数恢复到初始状态
-            mMediaPlayer.setDataSource(mData);
-            mMediaPlayer.prepare(); // 进行缓冲
-            mMediaPlayer.setOnPreparedListener(new PreparedListener(currentTime));// 注册一个监听器
-            handler.sendEmptyMessage(1);
+            mPlayer.reset();
+            //
+            mMusicModel = mList.get(position);
+            mPlayer.setDataSource(mMusicModel.mData);
+            //
+            mMusicModel.isPlaying = true;
+            //
+            mPlayer.prepare();
+            mPlayer.setOnPreparedListener(this);// Register a listener
+            //
+            setCache();
+            //
+            mHandler.sendEmptyMessage(1);
+            sendBroadcastToPlaying(mMusicModel);
+            sendBroadcastToList(mMusicModel);
+            //
+            if (mCurrPosition != -1 && mAction != PLY_PRIVIOUS) {
+                mPrePositions.add(mCurrPosition);
+                if (BuildConfig.DEBUG) {
+                    SCLogHelper.w(TAG, "play mPrePositions", mPrePositions);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private void pause() {
-        if (mMediaPlayer != null && mMediaPlayer.isPlaying()) {
-            mMediaPlayer.pause();
+        if (mPlayer != null && mPlayer.isPlaying()) {
+            mPlayer.pause();
+            mMusicModel.isPlaying = false;
+            sendBroadcastToPlaying(mMusicModel);
+            sendBroadcastToList(mMusicModel);
+            mHandler.removeMessages(1);
+            //
+            setCache();
         }
     }
 
     private void resume() {
-        if (!mMediaPlayer.isPlaying()) {
-            mMediaPlayer.start();
+        if (!mPlayer.isPlaying()) {
+            mPlayer.start();
         }
     }
 
-    private void previous() {
-        Intent sendIntent = new Intent(ACTION_UPDATE_ACTION);
-        sendIntent.putExtra(PLY_POSITION, mCurrentPosition);
-        // 发送广播，将被Activity组件中的BroadcastReceiver接收到
-        sendBroadcast(sendIntent);
-        play(0);
+    private void previous(int position) {
+        if (position >= 0) {
+            play(position);
+            mMusicModel = mList.get(position);
+            sendBroadcastToList(mMusicModel);
+        } else {
+            mCurrPosition++;
+            stop();
+        }
     }
 
-    private void next() {
-        Intent sendIntent = new Intent(ACTION_UPDATE_ACTION);
-        sendIntent.putExtra(PLY_POSITION, mCurrentPosition);
-        // 发送广播，将被Activity组件中的BroadcastReceiver接收到
-        sendBroadcast(sendIntent);
-        play(0);
+    private void next(int position) {
+        if (position <= mList.size() - 1) {
+            play(position);
+            mMusicModel = mList.get(position);
+            sendBroadcastToList(mMusicModel);
+        } else {
+            mCurrPosition--;
+            stop();
+        }
+    }
+
+    private void setCache() {
+        if (mMusicModel != null) {
+            ACache.get(getBaseContext()).put(CACHE_MODEL, mMusicModel);
+        }
+        if (mCurrPosition != -1) {
+            ACache.get(getBaseContext()).put(CACHE_POSITION, mCurrPosition);
+        }
+        ACache.get(getBaseContext()).put(CACHE_ORDER, mOrderState);
+        ACache.get(getBaseContext()).put(CACHE_REPEAT, mRepeatState);
+        ACache.get(getBaseContext()).put(CACHE_COUNT, mCount);
+    }
+
+    private void getCache() {
+        if (ACache.get(getBaseContext()).getAsString(MUSICLIST) != null) {
+            String lists = ACache.get(getBaseContext()).getAsString(MUSICLIST);
+            mList = JSONArray.parseArray(lists, MusicModel.class);
+            if (BuildConfig.DEBUG) {
+                SCLogHelper.w(TAG, "onCreate MusicList", mList);
+            }
+        }
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_MODEL) != null) {
+            mMusicModel = (MusicModel) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_MODEL);
+        }
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_POSITION) != null) {
+            mCurrPosition = (int) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_POSITION);
+            mPrePositions.add(mCurrPosition);
+        }
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_ORDER) != null) {
+            mOrderState = (int) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_ORDER);
+        }
+        if (ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_REPEAT) != null) {
+            mRepeatState = (int) ACache.get(getBaseContext()).getAsObject(MusicService.CACHE_REPEAT);
+        }
     }
 
     private void stop() {
-        if (mMediaPlayer != null) {
-            mMediaPlayer.stop();
-            try {
-                mMediaPlayer.prepare(); // 在调用stop后如果需要再次通过start进行播放,需要之前调用prepare函数
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (mPlayer != null) {
+            mPlayer.pause();
+            mPlayer.stop();
+            mPrePositions.clear();
+            mMusicModel.isPlaying = false;
+            sendBroadcastToPlaying(mMusicModel);
+            sendBroadcastToList(mMusicModel);
+            mHandler.removeMessages(1);
+            //
+            setCache();
         }
     }
 
+    private int getRandomIndex(int size) {
+        Random random = new Random(new Random().nextLong());
+        return random.nextInt(size);
+    }
 
-    private class PreparedListener implements MediaPlayer.OnPreparedListener {
+    private void sendBroadcastToPlaying(MusicModel model) {
+        Intent intent = new Intent(BROADCAST_ACTION_NOW_PLAYING);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(MUSIC_MODEL, model);
+        bundle.putInt(MUSIC_POSITION, mCurrPosition);
+        intent.putExtras(bundle);
+        sendBroadcast(intent);
+    }
 
-        private int currentTime;
+    private void sendBroadcastToList(MusicModel model) {
+        Intent intent = new Intent(MusicService.BROADCAST_ACTION_NEXT_SONGS);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable(MusicService.MUSIC_MODEL, model);
+        bundle.putInt(MusicService.MUSIC_POSITION, mCurrPosition);
+        intent.putExtras(bundle);
+        sendBroadcast(intent);
+    }
 
-        private PreparedListener(int currentTime) {
-            this.currentTime = currentTime;
+    @Override
+    public void onDestroy() {
+        if (mPlayer != null) {
+            mPlayer.stop();
+            mPlayer.release();
+            mPlayer = null;
         }
+        //
+        mHandler.removeMessages(1);
+        setCache();
+        unregisterReceiver(mReceiver);
+    }
 
-        @Override
-        public void onPrepared(MediaPlayer mp) {
-            mMediaPlayer.start(); // 开始播放
-            if (currentTime > 0) { // 如果音乐不是从头播放
-                mMediaPlayer.seekTo(currentTime);
+    @Override
+    public void onPrepared(MediaPlayer mediaPlayer) {
+        mediaPlayer.start();
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+        mCount++;
+        if (mCount == mList.size()) {
+            if (mRepeatState == REPEAT_LOOP_ALL) {
+                mCurrPosition = 0;
+                mCount = 0;
+                getNextPosition(mCurrPosition);
+                next(mCurrPosition);
+
+            } else if (mRepeatState == REPEAT_SINGLE) {
+                mCount--;
+                next(mCurrPosition);
+
+            } else if (mRepeatState == REPEAT_NORAML) {
+                mCount = 0;
+                stop();
             }
-            Intent intent = new Intent();
-            intent.setAction(ACTION_MUSIC_DURATION);
-            intent.putExtra(PLY_DURATION, mMediaPlayer.getDuration());  //通过Intent来传递歌曲的总长度
-            sendBroadcast(intent);
+        } else {
+            if (mRepeatState == REPEAT_LOOP_ALL) {
+                mCurrPosition = 0;
+                mCount = 0;
+                getNextPosition(mCurrPosition);
+                next(mCurrPosition);
+
+            } else if (mRepeatState == REPEAT_SINGLE) {
+                mCount--;
+                next(mCurrPosition);
+
+            } else if (mRepeatState == REPEAT_NORAML) {
+                getNextPosition(mCurrPosition);
+                next(mCurrPosition);
+            }
+        }
+        sendBroadcastToList(mMusicModel);
+        sendBroadcastToPlaying(mMusicModel);
+    }
+
+    private void getNextPosition(int curPosition) {
+        if (mOrderState == ORDER_BY_ORDER) {
+            mCurrPosition++;
+        } else {
+            mCurrPosition = getRandomIndex(mList.size());
+            while (mCurrPosition == curPosition) {
+                mCurrPosition = getRandomIndex(mList.size());
+            }
         }
     }
 
@@ -274,7 +374,10 @@ public class MusicService extends Service {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            mPlayStatus = intent.getIntExtra(STATUS, -1);
+            mRepeatState = intent.getIntExtra(REPEAT, REPEAT_NORAML);
+            mOrderState = intent.getIntExtra(ORDER, ORDER_BY_ORDER);
+            mMusicModel.isFavorite = intent.getBooleanExtra(MUSIC_FAVORITE, false);
+            setCache();
         }
     }
 }

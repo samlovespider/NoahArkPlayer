@@ -14,8 +14,8 @@ import com.caizhenliang.mylibrary.Imp.MyClickImp;
 import com.caizhenliang.mylibrary.Imp.MyLogImp;
 import com.caizhenliang.mylibrary.ui.view.MyAlertDialogTool;
 import com.caizhenliang.mylibrary.util.SCBus;
-import com.caizhenliang.mylibrary.util.SCCache;
 import com.caizhenliang.mylibrary.util.SCLogHelper;
+import com.caizhenliang.mylibrary.util.base.ACache;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.loopj.android.http.RequestParams;
@@ -33,7 +33,7 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
     protected ActionBar mActionBar;
     protected MyAlertDialogTool mAlertDialogTool;//use to create alertdialog
     protected AsyncHttpClient mHttpClient;
-    protected SCCache mCache;
+    protected ACache mCache;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -47,7 +47,7 @@ abstract public class MyBaseActivity extends AppCompatActivity implements MyBase
         // init AsyncHttpClient
         mHttpClient = new AsyncHttpClient();
         // init Cache
-        mCache = SCCache.getInstance(getBaseContext());
+        mCache = ACache.get(getBaseContext());
     }
 
     @Override

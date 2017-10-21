@@ -11,30 +11,27 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.activity.MainActivity_">
+        <activity
+            android:name=".ui.activity.MainActivity_"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activity.PlayingActivity_">
-        </activity>
-        <activity android:name=".ui.activity.MusicActivity_">
-        </activity>
 
         <service
-            android:name=".service.MusicService_"
+            android:name=".service.MusicService"
+            android:enabled="true"
             android:exported="true"
             android:label="@string/service_name"
             tools:ignore="ExportedService">
             <intent-filter>
-                <action android:name="android.media.browse.MediaBrowserService"/>
+                <action android:name="com.noahark.musicservice"/>
             </intent-filter>
         </service>
 
-        <activity android:name=".ui.activity.MusicActivity">
-        </activity>
     </application>
 
 </manifest>
