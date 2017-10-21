@@ -46,20 +46,27 @@ public class PlayingFragment extends BaseFragment {
     private PlayingReceiver mPlayingReceiver;  //customize the Broadcast Receiver
     private MusicModel mMusicModel;
     //
-    private int mRepeatState = MusicService.REPEAT_NORAML;
+    private int mRepeatState = MusicService.REPEAT_NORMAL;
     private int mOrderState = MusicService.ORDER_BY_ORDER;
     private int mLastPosition = -1;
 
+    /**
+     * initialise Playing Fragment view
+     */
     @Override
     public void initView() {
         // get cache model\position\repeat\order
         getCache();
-        // set diaplay info
+        // set display info
         setMusicInfo(mMusicModel);
         //
         setReceiver();
     }
 
+    /**
+     * get cache as music service object
+     * set model, position, order and repeat state
+     */
     private void getCache() {
         if (mCache.getAsObject(MusicService.CACHE_MODEL) != null) {
             mMusicModel = (MusicModel) mCache.getAsObject(MusicService.CACHE_MODEL);
@@ -76,8 +83,10 @@ public class PlayingFragment extends BaseFragment {
     }
 
     /**
-     * get music info to display
-     * set repeat, shuffle state
+     * get and set music info to display
+     * set song name and song artist
+     * set playing, repeat, shuffle, my favourite song state
+     * set song progress to beginning of song and display total duration of song
      * @param musicModel a song
      */
     private void setMusicInfo(MusicModel musicModel) {
@@ -96,7 +105,7 @@ public class PlayingFragment extends BaseFragment {
         }
 
         switch (mRepeatState) {
-            case MusicService.REPEAT_NORAML:
+            case MusicService.REPEAT_NORMAL:
                 ib_repeat.setBackgroundResource(R.drawable.ic_music_repeat_close);
                 break;
             case MusicService.REPEAT_LOOP_ALL:
@@ -128,6 +137,7 @@ public class PlayingFragment extends BaseFragment {
 
     /**
      * set receiver to get info from service
+     * set intent filters for receiver
      */
     private void setReceiver() {
         mPlayingReceiver = new PlayingReceiver();
@@ -140,6 +150,10 @@ public class PlayingFragment extends BaseFragment {
         mContext.registerReceiver(mPlayingReceiver, filter);
     }
 
+    /**
+     * create appropriate Playing Fragment view based on what user has clicked on
+     * @param view
+     */
     @Click({R.id.ibPlay, R.id.ib_favorite, R.id.ib_repeat, R.id.ib_shuffle})
     @Override
     public void initClick(View view) {
@@ -162,7 +176,7 @@ public class PlayingFragment extends BaseFragment {
                 break;
             case R.id.ib_repeat:
                 switch (mRepeatState) {
-                    case MusicService.REPEAT_NORAML:
+                    case MusicService.REPEAT_NORMAL:
                         mRepeatState = MusicService.REPEAT_LOOP_ALL;
                         view.setBackgroundResource(R.drawable.ic_music_repeat_all);
                         break;
@@ -171,7 +185,7 @@ public class PlayingFragment extends BaseFragment {
                         view.setBackgroundResource(R.drawable.ic_music_repeat_one);
                         break;
                     case MusicService.REPEAT_SINGLE:
-                        mRepeatState = MusicService.REPEAT_NORAML;
+                        mRepeatState = MusicService.REPEAT_NORMAL;
                         view.setBackgroundResource(R.drawable.ic_music_repeat_close);
                         break;
                 }
@@ -200,14 +214,25 @@ public class PlayingFragment extends BaseFragment {
         }
     }
 
+    /**
+     * intent - pause song
+     */
     private void pause() {
         startIntentToService(mLastPosition, MusicService.PLY_PAUSE);
     }
 
+    /**
+     * intent - play song
+     * @param position
+     */
     private void play(int position) {
         startIntentToService(position, MusicService.PLY_PLAY);
     }
 
+    /**
+     * create new intent with song's different states and package as bundle
+     * send bundle as broadcast to service
+     */
     private void sendBroadcastToService() {
         Intent intent = new Intent(MusicService.BROADCAST_ACTION_CHANGE_STATUS);
         Bundle bundle = new Bundle();
@@ -218,6 +243,12 @@ public class PlayingFragment extends BaseFragment {
         mContext.sendBroadcast(intent);
     }
 
+    /**
+     * create new intent with song info and state
+     * start service with intent
+     * @param position
+     * @param action
+     */
     private void startIntentToService(int position, int action) {
         Intent intent = new Intent(mContext, MusicService.class);
         intent.setAction(MusicService.SERVICE_ACTION);
@@ -226,6 +257,11 @@ public class PlayingFragment extends BaseFragment {
         mContext.startService(intent);
     }
 
+    /**
+     * Adjust to proper time format
+     * @param time
+     * @return
+     */
     private String formatTime(long time) {
         String min = time / (1000 * 60) + "";
         String sec = time % (1000 * 60) + "";
@@ -246,6 +282,9 @@ public class PlayingFragment extends BaseFragment {
         return min + ":" + sec.trim().substring(0, 2);
     }
 
+    /**
+     * Destroy the receiver
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -254,6 +293,12 @@ public class PlayingFragment extends BaseFragment {
 
     private class PlayingReceiver extends BroadcastReceiver {
 
+        /**
+         * On receiving intent from service
+         * Pass info to set intent as either new song playing state or song on pause state
+         * @param context
+         * @param intent
+         */
         @Override
         public void onReceive(Context context, Intent intent) {
 

@@ -42,7 +42,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public static final int PLY_NEXT = 5;
     //
     public static final String REPEAT = "repeat";
-    public static final int REPEAT_NORAML = 0;
+    public static final int REPEAT_NORMAL = 0;
     public static final int REPEAT_SINGLE = 1;
     public static final int REPEAT_LOOP_ALL = 2;
     //
@@ -74,7 +74,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private List<Integer> mPrePositions;
     private MusicModel mMusicModel;
     private int mCurrPosition = -1;
-    private int mRepeatState = REPEAT_NORAML;
+    private int mRepeatState = REPEAT_NORMAL;
     private int mOrderState = ORDER_BY_ORDER;
     private int mCurrentTime = 0;
     private int mAction;
@@ -335,7 +335,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 mCount--;
                 next(mCurrPosition);
 
-            } else if (mRepeatState == REPEAT_NORAML) {
+            } else if (mRepeatState == REPEAT_NORMAL) {
                 mCount = 0;
                 stop();
             }
@@ -350,7 +350,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 mCount--;
                 next(mCurrPosition);
 
-            } else if (mRepeatState == REPEAT_NORAML) {
+            } else if (mRepeatState == REPEAT_NORMAL) {
                 getNextPosition(mCurrPosition);
                 next(mCurrPosition);
             }
@@ -374,7 +374,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            mRepeatState = intent.getIntExtra(REPEAT, REPEAT_NORAML);
+            mRepeatState = intent.getIntExtra(REPEAT, REPEAT_NORMAL);
             mOrderState = intent.getIntExtra(ORDER, ORDER_BY_ORDER);
             mMusicModel.isFavorite = intent.getBooleanExtra(MUSIC_FAVORITE, false);
             setCache();
