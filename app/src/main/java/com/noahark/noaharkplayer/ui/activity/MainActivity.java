@@ -25,7 +25,7 @@ import org.androidannotations.annotations.WindowFeature;
 import java.util.ArrayList;
 
 /**
- * Peter Chiu,
+ * Peter Chiu, 08569541
  * Yuanda Huo,
  * Zhenliang Cai, 17108093
  */
