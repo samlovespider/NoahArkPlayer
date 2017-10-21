@@ -216,6 +216,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mMusicModel = mList.get(position);
             sendBroadcastToList(mMusicModel);
         } else {
+            mCurrPosition++;
             stop();
         }
     }
@@ -226,6 +227,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mMusicModel = mList.get(position);
             sendBroadcastToList(mMusicModel);
         } else {
+            mCurrPosition--;
             stop();
         }
     }
@@ -267,6 +269,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     private void stop() {
         if (mPlayer != null) {
+            mPlayer.pause();
             mPlayer.stop();
             mPrePositions.clear();
             mMusicModel.isPlaying = false;
@@ -275,11 +278,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             mHandler.removeMessages(1);
             //
             setCache();
-            try {
-                mPlayer.prepare();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -332,11 +330,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 mCurrPosition = 0;
                 mCount = 0;
                 getNextPosition(mCurrPosition);
-                play(mCurrPosition);
+                next(mCurrPosition);
 
             } else if (mRepeatState == REPEAT_SINGLE) {
                 mCount--;
-                play(mCurrPosition);
+                next(mCurrPosition);
 
             } else if (mRepeatState == REPEAT_NORAML) {
                 mCount = 0;
@@ -347,17 +345,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 mCurrPosition = 0;
                 mCount = 0;
                 getNextPosition(mCurrPosition);
-                play(mCurrPosition);
+                next(mCurrPosition);
 
             } else if (mRepeatState == REPEAT_SINGLE) {
                 mCount--;
-                play(mCurrPosition);
+                next(mCurrPosition);
 
             } else if (mRepeatState == REPEAT_NORAML) {
                 getNextPosition(mCurrPosition);
-                play(mCurrPosition);
+                next(mCurrPosition);
             }
         }
+        sendBroadcastToList(mMusicModel);
+        sendBroadcastToPlaying(mMusicModel);
     }
 
     private void getNextPosition(int curPosition) {

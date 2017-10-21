@@ -113,12 +113,7 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
         IntentFilter filter = new IntentFilter();
         // 指定BroadcastReceiver监听的Action
         filter.addAction(MusicService.BROADCAST_ACTION_NEXT_SONGS);
-        //
-//        filter.addAction(MusicService.ACTION_UPDATE_ACTION);
-//        filter.addAction(MusicService.ACTION_MUSIC_CURRENT);
-//        filter.addAction(MusicService.ACTION_MUSIC_DURATION);
-//        filter.addAction(MusicService.ACTION_REPEAT_ACTION);
-//        filter.addAction(MusicService.ACTION_SHUFFLE_ACTION);
+        filter.addAction(MusicService.BROADCAST_ACTION_NOW_PLAYING);
         // 注册BroadcastReceiver
         mContext.registerReceiver(mHomeReceiver, filter);
     }
@@ -348,6 +343,10 @@ public class PlayingListFragment extends BaseFragment implements LoadTaskListene
                 setPlayingIcon(position, mMusicModel.isPlaying);
                 //
                 mLastPosition = position;
+
+            } else if (action.equals(MusicService.BROADCAST_ACTION_NOW_PLAYING)) {
+//                mMusicModel = (MusicModel) intent.getExtras().getSerializable(MusicService.MUSIC_MODEL);
+//                mLastPosition = intent.getExtras().getInt(MusicService.MUSIC_POSITION, mLastPosition);
             }
         }
     }

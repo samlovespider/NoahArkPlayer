@@ -253,14 +253,14 @@ public class PlayingFragment extends BaseFragment {
 
             if (action.equals(MusicService.BROADCAST_ACTION_NOW_PLAYING)) {
                 mMusicModel = (MusicModel) intent.getExtras().getSerializable(MusicService.MUSIC_MODEL);
-                mLastPosition = intent.getExtras().getInt(MusicService.MUSIC_POSITION, -1);
+                mLastPosition = intent.getExtras().getInt(MusicService.MUSIC_POSITION, mLastPosition);
                 //
                 pbPlayProgress.setMaxValues(Integer.parseInt(mMusicModel.mDuration));
                 //
                 setMusicInfo(mMusicModel);
 
             } else if (action.equals(MusicService.BROADCAST_ACTION_CURRENT_TIME)) {
-                int curTime = intent.getIntExtra(MusicService.PLY_CURRENT_TIME, -1);
+                int curTime = intent.getIntExtra(MusicService.PLY_CURRENT_TIME, 0);
                 pbPlayProgress.setCurrentValues(curTime);
                 //
                 tvCurTime.setText(formatTime(curTime));
