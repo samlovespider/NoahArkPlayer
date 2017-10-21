@@ -26,7 +26,7 @@ import java.util.ArrayList;
 
 /**
  * Peter Chiu, 08569541
- * Yuanda Huo,
+ * Yuanda Huo, 16417122
  * Zhenliang Cai, 17108093
  */
 @WindowFeature(Window.FEATURE_NO_TITLE)
