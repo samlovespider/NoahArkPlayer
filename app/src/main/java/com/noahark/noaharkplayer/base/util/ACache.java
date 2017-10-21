@@ -54,7 +54,7 @@ public class ACache {
     public static final int TIME_HOUR = 60 * 60;
     public static final int TIME_DAY = TIME_HOUR * 24;
     private static final int MAX_SIZE = 1000 * 1000 * 50; // 50 mb
-    private static final int MAX_COUNT = Integer.MAX_VALUE; // 不限制存放数据的数量
+    private static final int MAX_COUNT = Integer.MAX_VALUE; // Does not limit the amount of data stored
     private static Map<String, ACache> mInstanceMap = new HashMap<String, ACache>();
     private ACacheManager mCache;
 
@@ -102,12 +102,12 @@ public class ACache {
     // =======================================
 
     /**
-     * 保存 String数据 到 缓存中
+     * store String data to Cache
      *
      * @param key
-     *            保存的key
+     *            stored key
      * @param value
-     *            保存的String数据
+     *            stored String data
      */
     public void put(String key, String value) {
         File file = mCache.newFile(key);
@@ -131,24 +131,24 @@ public class ACache {
     }
 
     /**
-     * 保存 String数据 到 缓存中
+     * store String data to cache
      *
      * @param key
-     *            保存的key
+     *            stored key
      * @param value
-     *            保存的String数据
+     *            stored String data
      * @param saveTime
-     *            保存的时间，单位：秒
+     *            stored time，unit：seconds
      */
     public void put(String key, String value, int saveTime) {
         put(key, Utils.newStringWithDateInfo(saveTime, value));
     }
 
     /**
-     * 读取 String数据
+     * read String data
      *
      * @param key
-     * @return String 数据
+     * @return String data
      */
     public String getAsString(String key) {
         File file = mCache.get(key);
@@ -186,28 +186,28 @@ public class ACache {
     }
 
     // =======================================
-    // ============= JSONObject 数据 读写 ==============
+    // ============= JSONObject data read and write ==============
     // =======================================
 
     /**
-     * 保存 JSONObject数据 到 缓存中
+     * store JSONObject data to Cache
      *
      * @param key
-     *            保存的key
+     *            stored key
      * @param value
-     *            保存的JSON数据
+     *            stored JSON data
      */
     public void put(String key, JSONObject value) {
         put(key, value.toString());
     }
 
     /**
-     * 保存 JSONObject数据 到 缓存中
+     * store JSONObject data to cache
      *
      * @param key
-     *            保存的key
+     *            stored key
      * @param value
-     *            保存的JSONObject数据
+     *            stored JSONObject data
      * @param saveTime
      *            保存的时间，单位：秒
      */
@@ -216,10 +216,10 @@ public class ACache {
     }
 
     /**
-     * 读取JSONObject数据
+     * read JSONObject data
      *
      * @param key
-     * @return JSONObject数据
+     * @return JSONObject data
      */
     public JSONObject getAsJSONObject(String key) {
         String JSONString = getAsString(key);
@@ -233,11 +233,11 @@ public class ACache {
     }
 
     // =======================================
-    // ============ JSONArray 数据 读写 =============
+    // ============ JSONArray data read and write =============
     // =======================================
 
     /**
-     * 保存 JSONArray数据 到 缓存中
+     * stored JSONArray data to cache
      *
      * @param key
      *            保存的key
@@ -263,7 +263,7 @@ public class ACache {
     }
 
     /**
-     * 读取JSONArray数据
+     * read JSONArray data
      *
      * @param key
      * @return JSONArray数据
@@ -280,11 +280,11 @@ public class ACache {
     }
 
     // =======================================
-    // ============== byte 数据 读写 =============
+    // ============== byte data read and write =============
     // =======================================
 
     /**
-     * 保存 byte数据 到 缓存中
+     * stored byte data to cache
      *
      * @param key
      *            保存的key
@@ -365,7 +365,7 @@ public class ACache {
     }
 
     // =======================================
-    // ============= 序列化 数据 读写 ===============
+    // ============= Serialization data read and write ===============
     // =======================================
 
     /**
